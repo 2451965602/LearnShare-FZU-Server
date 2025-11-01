@@ -3,9 +3,12 @@
 package resource
 
 import (
-	"context"
-
 	resource "LearnShare/biz/model/resource"
+	"LearnShare/biz/pack"
+	"LearnShare/biz/service"
+	"LearnShare/pkg/errno"
+	"context"
+	"strconv"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -18,11 +21,23 @@ func SearchResources(ctx context.Context, c *app.RequestContext) {
 	var req resource.SearchResourceReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(resource.SearchResourceResp)
+
+	// Call service
+	moduleResources, total, err := service.NewSearchResourcesService(ctx).SearchResources(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// Build response
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.Resources = moduleResources
+	resp.Total = int32(total)
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -82,29 +97,70 @@ func GetResource(ctx context.Context, c *app.RequestContext) {
 	var req resource.GetResourceReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(resource.GetResourceResp)
 
+	// Call service
+	resource, err := service.NewGetResourceService(ctx).GetResource(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// Build response
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.Resource = resource
+
 	c.JSON(consts.StatusOK, resp)
 }
 
 // SubmitResourceRating .
-// @router /api/resource_ratings/{rating_id} [POST]
+// @router /api/resource_ratings/{resource_id} [POST]
 func SubmitResourceRating(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req resource.SubmitResourceRatingReq
-	err = c.BindAndValidate(&req)
+
+	// 从路径参数获取resource_id
+	resourceIDStr := c.Param("resource_id")
+	resourceID, err := strconv.ParseInt(resourceIDStr, 10, 64)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, errno.ParamVerifyError)
 		return
 	}
 
+	// 绑定请求体参数
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// 设置resource_id到请求结构体
+	req.ResourceId = resourceID
+
 	resp := new(resource.SubmitResourceRatingResp)
 
-	c.JSON(consts.StatusOK, resp)
+	// 获取当前用户ID
+	userID, exists := c.Get("user_id")
+	if !exists {
+		pack.BuildFailResponse(c, errno.AuthInvalid)
+		return
+	}
+
+	// Call service
+	_, err = service.NewSubmitResourceRatingService(ctx).SubmitResourceRating(&req, userID.(int64))
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// Build response
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+
+	c.JSON(consts.StatusCreated, resp)
 }
 
 // DeleteResourceRating .
@@ -124,29 +180,59 @@ func DeleteResourceRating(ctx context.Context, c *app.RequestContext) {
 }
 
 // SubmitResourceComment .
-// @router /api/resource_comments/{comment_id} [POST]
+// @router /api/resource_comments/{resource_id} [POST]
 func SubmitResourceComment(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req resource.SubmitResourceCommentReq
-	err = c.BindAndValidate(&req)
+
+	// 从路径参数获取resource_id
+	resourceIDStr := c.Param("resource_id")
+	resourceID, err := strconv.ParseInt(resourceIDStr, 10, 64)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, errno.ParamVerifyError)
 		return
 	}
 
+	// 绑定请求体参数
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// 设置resource_id到请求结构体
+	req.ResourceId = resourceID
+
 	resp := new(resource.SubmitResourceCommentResp)
+
+	// 获取当前用户ID
+	userID, exists := c.Get("user_id")
+	if !exists {
+		pack.BuildFailResponse(c, errno.AuthInvalid)
+		return
+	}
+
+	// Call service
+	_, err = service.NewSubmitResourceCommentService(ctx).SubmitResourceComment(&req, userID.(int64))
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// Build response
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
 
 	c.JSON(consts.StatusOK, resp)
 }
 
 // DeleteResourceComment .
-// @router /api/resources_comments/{comment_id} [DELETE]
+// @router /api/resource_comments/{comment_id} [DELETE]
 func DeleteResourceComment(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req resource.DeleteResourceCommentReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
@@ -162,11 +248,23 @@ func GetResourceComments(ctx context.Context, c *app.RequestContext) {
 	var req resource.GetResourceCommentsReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(resource.GetResourceCommentsResp)
+
+	// Call service
+	comments, total, err := service.NewGetResourceCommentsService(ctx).GetResourceComments(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// Build response
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.Comments = comments
+	resp.Total = int32(total)
 
 	c.JSON(consts.StatusOK, resp)
 }

@@ -90,7 +90,7 @@ struct ResourceRating{
     required i64 ratingId,
     required i64 userId,
     required i64 resourceId,
-    required i64 recommendation,
+    required double recommendation,
     required bool isVisible,
     required i64 createdAt,
 }

@@ -105,3 +105,8 @@ func _deleteresourcecommentMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func __7bresource_id_7d1Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
