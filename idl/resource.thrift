@@ -62,8 +62,8 @@ struct GetResourceResp {
 
 // 提交资源评分请求
 struct SubmitResourceRatingReq {
-    1: required i64 resourceId (api.path="resource_id"),
-    2: required double rating,
+    1: required i64 resourceId,
+    2: required i64 recommendation,
 }
 
 struct SubmitResourceRatingResp {
@@ -122,11 +122,11 @@ service ResourceService {
     GetResourceResp getResource(1: GetResourceReq req)(api.get="/api/resources/{resource_id}"),
     
     // 资源评分相关API
-    SubmitResourceRatingResp submitResourceRating(1: SubmitResourceRatingReq req)(api.post="/api/resource_ratings/{resource_id}"),
+    SubmitResourceRatingResp submitResourceRating(1: SubmitResourceRatingReq req)(api.post="/api/resource_ratings/{rating_id}"),
     DeleteResourceRatingResp deleteResourceRating(1: DeleteResourceRatingReq req)(api.delete="/api/resource_ratings/{rating_id}"),
     
     // 资源评论相关API
-    SubmitResourceCommentResp submitResourceComment(1: SubmitResourceCommentReq req)(api.post="/api/resource_comments/{resource_id}"),
-    DeleteResourceCommentResp deleteResourceComment(1: DeleteResourceCommentReq req)(api.delete="/api/resource_comments/{comment_id}"),
-    GetResourceCommentsResp getResourceComments(1: GetResourceCommentsReq req)(api.get="/api/resource_comments/{resource_id}"),
+    SubmitResourceCommentResp submitResourceComment(1: SubmitResourceCommentReq req)(api.post="/api/resource_comments/{comment_id}"),
+    DeleteResourceCommentResp deleteResourceComment(1: DeleteResourceCommentReq req)(api.delete="/api/resources_comments/{comment_id}"),
+    GetResourceCommentsResp getResourceComments(1: GetResourceCommentsReq req)(api.get="/api/resource/{resource_id}/comment"),
 }
