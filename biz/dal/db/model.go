@@ -262,15 +262,44 @@ func (r ResourceRating) ToResourceRatingModule() *module.ResourceRating {
 }
 
 type Review struct {
-	ReviewID   int64      `gorm:"primaryKey;autoIncrement;column:review_id"`
-	TargetID   int64      `gorm:"not null;column:target_id"`
-	TargetType string     `gorm:"size:50;not null;column:target_type"`
-	Reason     string     `gorm:"type:text;not null;column:reason"`
-	Status     string     `gorm:"type:enum('pending','approved','rejected');default:'pending';column:status"`
-	Priority   int        `gorm:"default:3;column:priority"`
-	ReviewerID *int64     `gorm:"column:reviewer_id"`
-	ReviewedAt *time.Time `gorm:"column:reviewed_at"`
-	CreatedAt  time.Time  `gorm:"autoCreateTime;column:created_at"`
+    ReviewID   int64      `gorm:"primaryKey;autoIncrement;column:review_id"`
+    TargetID   int64      `gorm:"not null;column:target_id"`
+    TargetType string     `gorm:"size:50;not null;column:target_type"`
+    Reason     string     `gorm:"type:text;not null;column:reason"`
+    Status     string     `gorm:"type:enum('pending','approved','rejected');default:'pending';column:status"`
+    Priority   int        `gorm:"default:3;column:priority"`
+    ReviewerID *int64     `gorm:"column:reviewer_id"`
+    ReviewedAt *time.Time `gorm:"column:reviewed_at"`
+    CreatedAt  time.Time  `gorm:"autoCreateTime;column:created_at"`
+}
+
+// ToReviewModule 将db.Review转换为model.Review
+func (r Review) ToReviewModule() *module.Review {
+    var reviewerId int64
+    if r.ReviewedAt != nil && r.ReviewerID != nil {
+        reviewerId = *r.ReviewerID
+    } else {
+        reviewerId = 0
+    }
+
+    var reporterId int64
+    if r.ReviewerID != nil {
+        reporterId = *r.ReviewerID
+    } else {
+        reporterId = 0
+    }
+
+    return &module.Review{
+        ReviewId:   r.ReviewID,
+        ReviewerId: reviewerId,
+        ReporterId: reporterId,
+        TargetId:   r.TargetID,
+        TargetType: r.TargetType,
+        Reason:     r.Reason,
+        Status:     r.Status,
+        Priority:   int64(r.Priority),
+        CreatedAt:  r.CreatedAt.Unix(),
+    }
 }
 
 // Permission 权限表结构

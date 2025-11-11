@@ -31,7 +31,7 @@ func Register(r *server.Hertz) {
 				_courses.POST("/:review_id", append(_auditcourseMw(), audit.AuditCourse)...)
 				_audit.GET("/resources", append(_getresourceauditlistMw(), audit.GetResourceAuditList)...)
 				_resources := _audit.Group("/resources", _resourcesMw()...)
-				_resources.POST("/:review_id", append(_auditresourceMw(), audit.AuditResource)...)
+				_resources.PUT("/:review_id", append(_auditresourceMw(), audit.AuditResource)...)
 			}
 		}
 	}

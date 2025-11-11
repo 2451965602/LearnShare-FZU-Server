@@ -4,6 +4,8 @@ package audit
 
 import (
 	"LearnShare/biz/pack"
+	"LearnShare/biz/service"
+	"LearnShare/pkg/errno"
 	"context"
 
 	"LearnShare/biz/model/audit"
@@ -23,12 +25,22 @@ func GetResourceAuditList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(audit.GetResourceAuditListResp)
+	// 调用服务
+	reviews, err := service.NewAuditService(ctx, c).GetResourceAuditList(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// 构建响应
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.ResourceReviewList = reviews
 
 	pack.SendResponse(c, resp)
 }
 
 // AuditResource .
-// @router /api/admin/audit/resources/:review_id [POST]
+// @router /api/admin/audit/resources/:review_id [PUT]
 func AuditResource(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req audit.AuditResourceReq
@@ -39,6 +51,15 @@ func AuditResource(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(audit.AuditResourceResp)
+	// 调用服务
+	err = service.NewAuditService(ctx, c).AuditResource(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// 构建响应
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
 
 	pack.SendResponse(c, resp)
 }

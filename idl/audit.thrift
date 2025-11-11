@@ -56,7 +56,7 @@ struct AuditCommentResp{
 
 service AdminAuditService {
     GetResourceAuditListResp GetResourceAuditList(1:GetResourceAuditListReq req)(api.get="/api/admin/audit/resources"),
-    AuditResourceResp AuditResource(1:AuditResourceReq req)(api.post="/api/admin/audit/resources/:review_id"),
+    AuditResourceResp AuditResource(1:AuditResourceReq req)(api.put="/api/admin/audit/resources/:review_id"),
     GetCourseAuditListResp GetCourseAuditList(1:GetCourseAuditListReq req)(api.get="/api/admin/audit/courses"),
     AuditCourseResp AuditCourse(1:AuditCourseReq req)(api.post="/api/admin/audit/courses/:review_id"),
     GetCommentAuditListResp GetCommentAuditList(1:GetCommentAuditListReq req)(api.get="/api/admin/audit/comments"),

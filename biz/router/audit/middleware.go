@@ -3,6 +3,8 @@
 package audit
 
 import (
+	"LearnShare/biz/router/auth"
+
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -63,10 +65,14 @@ func _resourcesMw() []app.HandlerFunc {
 
 func _getresourceauditlistMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _auditresourceMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
