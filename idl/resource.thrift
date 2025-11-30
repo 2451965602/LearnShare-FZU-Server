@@ -33,7 +33,7 @@ struct UploadResourceResp {
 
 // 下载资源请求
 struct DownloadResourceReq {
-    1: required i64 resource_id, 
+    1: required i64 resource_id (api.path="resource_id"),
 }
 
 struct DownloadResourceResp {

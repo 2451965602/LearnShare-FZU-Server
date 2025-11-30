@@ -63,7 +63,7 @@ struct GetResourceCommentAuditListReq{
 }
 struct GetResourceCommentAuditListResp{
     required model.BaseResp base_resp,
-    required list<model.ResourceComment> comment_audit_list,
+    required list<model.review> comment_audit_list,
 }
 
 struct AuditCourseCommentReq{
@@ -93,7 +93,6 @@ service AdminAuditService {
     AuditCourseCommentResp AuditCourseComment(1:AuditCourseCommentReq req)(api.post="/api/admin/audit/course_comments/:review_id"),
     AuditResourceCommentResp AuditResourceComment(1:AuditResourceCommentReq req)(api.post="/api/admin/audit/resource_comments/:review_id"),
 }
-
 
 
 

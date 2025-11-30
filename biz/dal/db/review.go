@@ -29,6 +29,20 @@ func GetPendingResourceReviews(ctx context.Context, pageNum, pageSize int) ([]*R
 	return reviews, nil
 }
 
+func CountPendingResourceReviews(ctx context.Context) (int64, error) {
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var total int64
+	err := DB.WithContext(ctxWithTimeout).Table(constants.ReviewTableName).
+		Where("target_type = ? AND status = ?", "resource", "pending").
+		Count(&total).Error
+	if err != nil {
+		return 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "统计资源举报数量失败: "+err.Error())
+	}
+	return total, nil
+}
+
 // AuditResourceReview 审核资源举报记录
 func AuditResourceReview(ctx context.Context, reviewID, reviewerID int64, action string) error {
 	// 开始事务
@@ -164,22 +178,19 @@ func AuditResourceCommentReview(ctx context.Context, reviewID, reviewerID int64,
 	return nil
 }
 
-// GetPendingResourceComments 获取待审核的资源评论列表
-func GetPendingResourceComments(ctx context.Context, pageNum, pageSize int) ([]*ResourceComment, error) {
+func GetPendingCommentReviews(ctx context.Context, pageNum, pageSize int) ([]*Review, error) {
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	var comments []*ResourceComment
-	err := DB.WithContext(ctxWithTimeout).
-		Table(constants.ResourceCommentTableName+" AS c").
-		Joins("JOIN "+constants.ReviewTableName+" r ON r.target_id = c.comment_id").
-		Where("r.target_type = ? AND r.status = ?", "comment", "pending").
-		Order("r.created_at desc").
+	var reviews []*Review
+	err := DB.WithContext(ctxWithTimeout).Table(constants.ReviewTableName).
+		Where("target_type = ? AND status = ?", "comment", "pending").
+		Order("created_at desc").
 		Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
-		Find(&comments).Error
+		Find(&reviews).Error
 	if err != nil {
-		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询待审核资源评论列表失败: "+err.Error())
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询待审核资源评论的审核记录失败: "+err.Error())
 	}
-	return comments, nil
+	return reviews, nil
 }

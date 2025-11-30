@@ -44,20 +44,46 @@ func IsFile(data *multipart.FileHeader, allowedTypes []string) error {
 	}
 
 	kind, _ := filetype.Match(buffer[:n])
-	if kind == filetype.Unknown && len(allowedTypes) > 0 {
-		return errno.NewErrNo(errno.ParamVerifyErrorCode, "不支持的文件类型")
-	}
 
-	// 如果没有白名单，直接通过类型检测（若检测不到类型且 allowedTypes 为空，也认为通过）
 	if len(allowedTypes) == 0 {
 		return nil
 	}
 
-	for _, t := range allowedTypes {
-		if kind.MIME.Value == t {
-			return nil
+	if kind != filetype.Unknown {
+		for _, t := range allowedTypes {
+			if kind.MIME.Value == t {
+				return nil
+			}
+		}
+		logger.Debugf("Upload type mismatch on content: detected=%s allowed=%v filename=%s", kind.MIME.Value, allowedTypes, data.Filename)
+	}
+
+	ext := strings.TrimPrefix(strings.ToLower(filepath.Ext(data.Filename)), ".")
+	var extMime string
+	switch ext {
+	case "pdf":
+		extMime = "application/pdf"
+	case "docx":
+		extMime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+	case "pptx":
+		extMime = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+	case "zip":
+		extMime = "application/zip"
+	}
+	if extMime != "" {
+		for _, t := range allowedTypes {
+			if t == extMime {
+				return nil
+			}
 		}
 	}
+	logger.Debugf("Upload type rejected: detected=%s ext=%s extMime=%s allowed=%v filename=%s", func() string {
+		if kind == filetype.Unknown {
+			return "unknown"
+		} else {
+			return kind.MIME.Value
+		}
+	}(), ext, extMime, allowedTypes, data.Filename)
 	return errno.NewErrNo(errno.ParamVerifyErrorCode, "不支持的文件类型")
 }
 
@@ -110,7 +136,16 @@ func Upload(localFile, filename, class string, targetId int64) (string, error) {
 	upToken := putPolicy.UploadToken(mac)
 
 	cfg := storage.Config{}
-	cfg.Region = getQiniuZone(config.Oss.Zone)
+	// 自动探测区域：当配置为空、为 auto 或者配置不匹配时由 SDK 动态解析
+	if strings.EqualFold(config.Oss.Zone, "") || strings.EqualFold(config.Oss.Zone, "auto") {
+		if region, err := storage.GetRegion(config.Oss.AccessKeyID, config.Oss.BucketName); err == nil {
+			cfg.Region = region
+		} else {
+			cfg.Region = getQiniuZone(config.Oss.Zone)
+		}
+	} else {
+		cfg.Region = getQiniuZone(config.Oss.Zone)
+	}
 	cfg.UseCdnDomains = config.Oss.UseCdnDomains // 由配置决定
 
 	resumeUploader := storage.NewResumeUploaderV2(&cfg)
@@ -143,7 +178,7 @@ func Upload(localFile, filename, class string, targetId int64) (string, error) {
 	return storage.MakePublicURL(config.Oss.Endpoint, ret.Key), nil
 }
 
-func getQiniuZone(region string) *storage.Zone {
+func getQiniuZone(region string) *storage.Region {
 	switch region {
 	case "z0":
 		return &storage.Zone_z0
@@ -172,9 +207,22 @@ func UploadFile(data *multipart.FileHeader, class string, targetId int64) (strin
 			"application/vnd.openxmlformats-officedocument.presentationml.presentation",
 			"application/zip",
 		}
-	}
-	if err := IsFile(data, allowedTypes); err != nil {
-		return "", errno.NewErrNo(errno.ParamVerifyErrorCode, "不支持的文件类型")
+		// 资源文件：若扩展名在白名单中，直接放行，避免部分环境内容类型识别不稳定
+		ext := strings.TrimPrefix(strings.ToLower(filepath.Ext(data.Filename)), ".")
+		switch ext {
+		case "pdf", "docx", "pptx", "zip":
+			// 直接通过，不再依赖内容识别
+		default:
+			// 扩展名不在白名单，退回到内容识别
+			if err := IsFile(data, allowedTypes); err != nil {
+				return "", errno.NewErrNo(errno.ParamVerifyErrorCode, "不支持的文件类型")
+			}
+		}
+	} else {
+		// 其他分类仍使用内容识别
+		if err := IsFile(data, allowedTypes); err != nil {
+			return "", errno.NewErrNo(errno.ParamVerifyErrorCode, "不支持的文件类型")
+		}
 	}
 
 	if class == "resource" {

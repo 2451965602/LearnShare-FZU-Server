@@ -1318,7 +1318,7 @@ func (p *UploadResourceResp) String() string {
 
 // 下载资源请求
 type DownloadResourceReq struct {
-	ResourceID int64 `thrift:"resource_id,1,required" form:"resource_id,required" json:"resource_id,required" query:"resource_id,required"`
+	ResourceID int64 `thrift:"resource_id,1,required" json:"resource_id,required" path:"resource_id,required"`
 }
 
 func NewDownloadResourceReq() *DownloadResourceReq {

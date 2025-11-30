@@ -2635,8 +2635,8 @@ func (p *GetResourceCommentAuditListReq) String() string {
 }
 
 type GetResourceCommentAuditListResp struct {
-	BaseResp         *module.BaseResp          `thrift:"base_resp,1,required" form:"base_resp,required" json:"base_resp,required" query:"base_resp,required"`
-	CommentAuditList []*module.ResourceComment `thrift:"comment_audit_list,2,required,list<module.ResourceComment>" form:"comment_audit_list,required" json:"comment_audit_list,required" query:"comment_audit_list,required"`
+	BaseResp         *module.BaseResp `thrift:"base_resp,1,required" form:"base_resp,required" json:"base_resp,required" query:"base_resp,required"`
+	CommentAuditList []*module.Review `thrift:"comment_audit_list,2,required,list<module.Review>" form:"comment_audit_list,required" json:"comment_audit_list,required" query:"comment_audit_list,required"`
 }
 
 func NewGetResourceCommentAuditListResp() *GetResourceCommentAuditListResp {
@@ -2655,7 +2655,7 @@ func (p *GetResourceCommentAuditListResp) GetBaseResp() (v *module.BaseResp) {
 	return p.BaseResp
 }
 
-func (p *GetResourceCommentAuditListResp) GetCommentAuditList() (v []*module.ResourceComment) {
+func (p *GetResourceCommentAuditListResp) GetCommentAuditList() (v []*module.Review) {
 	return p.CommentAuditList
 }
 
@@ -2760,8 +2760,8 @@ func (p *GetResourceCommentAuditListResp) ReadField2(iprot thrift.TProtocol) err
 	if err != nil {
 		return err
 	}
-	_field := make([]*module.ResourceComment, 0, size)
-	values := make([]module.ResourceComment, size)
+	_field := make([]*module.Review, 0, size)
+	values := make([]module.Review, size)
 	for i := 0; i < size; i++ {
 		_elem := &values[i]
 		_elem.InitDefault()

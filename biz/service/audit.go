@@ -32,12 +32,26 @@ func (s *AuditService) GetResourceAuditList(req *audit.GetResourceAuditListReq) 
 		req.PageSize = 20
 	}
 
+	// 统计总数用于越界页处理
+	total, err := db.CountPendingResourceReviews(s.ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// 若请求页越界，自动定位到最后一页
+	if total > 0 {
+		maxPage := (total + int64(req.PageSize) - 1) / int64(req.PageSize)
+		if int64(req.PageNum) > maxPage {
+			req.PageNum = int32(maxPage)
+		}
+	}
+
 	reviews, err := db.GetPendingResourceReviews(s.ctx, int(req.PageNum), int(req.PageSize))
 	if err != nil {
 		return nil, err
 	}
 
-	var moduleReviews []*model.Review
+	moduleReviews := make([]*model.Review, 0, len(reviews))
 	for _, r := range reviews {
 		moduleReviews = append(moduleReviews, r.ToReviewModule())
 	}
@@ -65,7 +79,7 @@ func (s *AuditService) AuditResource(req *audit.AuditResourceReq) error {
 }
 
 // GetResourceCommentAuditList 获取待审核的资源评论列表
-func (s *AuditService) GetResourceCommentAuditList(req *audit.GetResourceCommentAuditListReq) ([]*model.ResourceComment, error) {
+func (s *AuditService) GetResourceCommentAuditList(req *audit.GetResourceCommentAuditListReq) ([]*model.Review, error) {
 	if req.PageNum <= 0 {
 		req.PageNum = 1
 	}
@@ -73,15 +87,15 @@ func (s *AuditService) GetResourceCommentAuditList(req *audit.GetResourceComment
 		req.PageSize = 20
 	}
 
-	comments, err := db.GetPendingResourceComments(s.ctx, int(req.PageNum), int(req.PageSize))
+	reviews, err := db.GetPendingCommentReviews(s.ctx, int(req.PageNum), int(req.PageSize))
 	if err != nil {
 		return nil, err
 	}
-	var modules []*model.ResourceComment
-	for _, c := range comments {
-		modules = append(modules, c.ToResourceCommentModule())
+	reviewModules := make([]*model.Review, 0, len(reviews))
+	for _, r := range reviews {
+		reviewModules = append(reviewModules, r.ToReviewModule())
 	}
-	return modules, nil
+	return reviewModules, nil
 }
 
 func (s *AuditService) AuditCourseComment(req *audit.AuditCourseCommentReq) error {

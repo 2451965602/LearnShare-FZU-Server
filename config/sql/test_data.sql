@@ -246,6 +246,12 @@ INSERT INTO `reviews` (`target_id`, `reporter_id`, `target_type`, `reason`, `pri
                                                                                                                      (15, 9, 'course_rating', '用户评分可能存在恶意刷分行为', 4, 2, 'pending'),
                                                                                                                      (18, 10, 'resource_rating', '评分与资源质量明显不符', 3, 2, 'pending');
 
+-- 追加：资源评论的待审核记录（用于测试 /api/admin/audit/resource_comments）
+INSERT INTO `reviews` (`target_id`, `reporter_id`, `target_type`, `reason`, `priority`, `reviewer_id`, `status`) VALUES
+                                                                                                                     (11, 3, 'comment', '资源评论涉嫌广告，待审核', 3, NULL, 'pending'),
+                                                                                                                     (16, 4, 'comment', '资源评论可能包含不当言辞，待审核', 4, NULL, 'pending'),
+                                                                                                                     (20, 5, 'comment', '资源评论内容需人工复核', 3, NULL, 'pending');
+
 -- ----------------------------
 -- 16. 物品 items
 -- ----------------------------
