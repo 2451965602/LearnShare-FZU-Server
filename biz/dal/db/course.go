@@ -547,3 +547,115 @@ func AdminDeleteCourseRating(ctx context.Context, ratingID int64) error {
 	}
 	return nil
 }
+
+// ReactCourseComment 处理课程评论的点赞/点踩/取消
+func ReactCourseComment(ctx context.Context, userID, commentID int64, action string) error {
+	tx := DB.WithContext(ctx).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 验证评论是否存在且可见
+	var comment CourseComment
+	if err := tx.Table(constants.CourseCommentTableName).
+		Where("comment_id = ? AND is_visible = ? AND status = ?", commentID, true, "normal").
+		First(&comment).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			tx.Rollback()
+			return errno.ResourceInvalidCommentError // 可复用或定义新的错误码
+		}
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询课程评论失败: "+err.Error())
+	}
+
+	// 查询用户是否已有反应
+	var existing CourseCommentReaction
+	err := tx.Table(constants.CourseCommentReactionTableName).
+		Where("user_id = ? AND comment_id = ?", userID, commentID).
+		First(&existing).Error
+
+	hasExisting := !errors.Is(err, gorm.ErrRecordNotFound)
+
+	switch action {
+	case "like":
+		if !hasExisting {
+			rec := &CourseCommentReaction{UserID: userID, CommentID: commentID, Reaction: "like"}
+			if err := tx.Table(constants.CourseCommentReactionTableName).Create(rec).Error; err != nil {
+				tx.Rollback()
+				return errno.NewErrNo(errno.InternalDatabaseErrorCode, "创建课程评论点赞记录失败: "+err.Error())
+			}
+			if err := tx.Table(constants.CourseCommentTableName).Where("comment_id = ?", commentID).Update("likes", gorm.Expr("likes + 1")).Error; err != nil {
+				tx.Rollback()
+				return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新课程评论点赞数失败: "+err.Error())
+			}
+		} else if existing.Reaction == "dislike" {
+			if err := tx.Table(constants.CourseCommentReactionTableName).Where("reaction_id = ?", existing.ReactionID).Update("reaction", "like").Error; err != nil {
+				tx.Rollback()
+				return errno.NewErrNo(errno.InternalDatabaseErrorCode, "切换为点赞失败: "+err.Error())
+			}
+			if err := tx.Table(constants.CourseCommentTableName).Where("comment_id = ?", commentID).Update("likes", gorm.Expr("likes + 1")).Error; err != nil {
+				tx.Rollback()
+				return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新点赞数失败: "+err.Error())
+			}
+		}
+		// 若已是 like，则无操作
+
+	case "dislike":
+		if !hasExisting {
+			rec := &CourseCommentReaction{UserID: userID, CommentID: commentID, Reaction: "dislike"}
+			if err := tx.Table(constants.CourseCommentReactionTableName).Create(rec).Error; err != nil {
+				tx.Rollback()
+				return errno.NewErrNo(errno.InternalDatabaseErrorCode, "创建课程评论点踩记录失败: "+err.Error())
+			}
+		} else if existing.Reaction == "like" {
+			if err := tx.Table(constants.CourseCommentReactionTableName).Where("reaction_id = ?", existing.ReactionID).Update("reaction", "dislike").Error; err != nil {
+				tx.Rollback()
+				return errno.NewErrNo(errno.InternalDatabaseErrorCode, "切换为点踩失败: "+err.Error())
+			}
+			if err := tx.Table(constants.CourseCommentTableName).Where("comment_id = ? AND likes > 0", commentID).Update("likes", gorm.Expr("likes - 1")).Error; err != nil {
+				tx.Rollback()
+				return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新点赞数失败: "+err.Error())
+			}
+		}
+
+	case "cancel_like":
+		if hasExisting && existing.Reaction == "like" {
+			if err := tx.Table(constants.CourseCommentReactionTableName).Where("reaction_id = ?", existing.ReactionID).Delete(&CourseCommentReaction{}).Error; err != nil {
+				tx.Rollback()
+				return errno.NewErrNo(errno.InternalDatabaseErrorCode, "撤销课程评论点赞失败: "+err.Error())
+			}
+			if err := tx.Table(constants.CourseCommentTableName).Where("comment_id = ? AND likes > 0", commentID).Update("likes", gorm.Expr("likes - 1")).Error; err != nil {
+				tx.Rollback()
+				return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新点赞数失败: "+err.Error())
+			}
+		}
+
+	case "cancel_dislike":
+		if hasExisting && existing.Reaction == "dislike" {
+			if err := tx.Table(constants.CourseCommentReactionTableName).Where("reaction_id = ?", existing.ReactionID).Delete(&CourseCommentReaction{}).Error; err != nil {
+				tx.Rollback()
+				return errno.NewErrNo(errno.InternalDatabaseErrorCode, "撤销课程评论点踩失败: "+err.Error())
+			}
+		}
+
+	default:
+		tx.Rollback()
+		return errno.ParamVerifyError.WithMessage("操作类型无效")
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交课程评论反应事务失败: "+err.Error())
+	}
+	return nil
+}
+
+// ReactCourseCommentAsync 异步处理课程评论反应（点赞/点踩等）
+func ReactCourseCommentAsync(ctx context.Context, userID, commentID int64, action string) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return ReactCourseComment(ctx, userID, commentID, action)
+	})
+}

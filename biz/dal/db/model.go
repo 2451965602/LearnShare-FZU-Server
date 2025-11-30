@@ -228,6 +228,15 @@ func (c CourseComment) ToCourseCommentModule() *module.CourseComment {
 	}
 }
 
+// CourseCommentReaction 课程评论反应模型
+type CourseCommentReaction struct {
+	ReactionID int64     `gorm:"primaryKey;autoIncrement"`
+	UserID     int64     `gorm:"not null"`
+	CommentID  int64     `gorm:"not null"`
+	Reaction   string    `gorm:"type:enum('like','dislike');not null"`
+	CreatedAt  time.Time `gorm:"autoCreateTime"`
+}
+
 type CommentUserRow struct {
 	CommentID int64     `gorm:"column:comment_id"`
 	CourseID  int64     `gorm:"column:course_id"`

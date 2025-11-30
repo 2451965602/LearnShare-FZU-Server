@@ -37,6 +37,10 @@ func Register(r *server.Hertz) {
 		{
 			_course_comments0 := _api.Group("/course_comments", _course_comments0Mw()...)
 			_course_comments0.POST("/:course_id", append(_submitcoursecommentMw(), course.SubmitCourseComment)...)
+			{
+				_comment_id := _course_comments0.Group("/:comment_id", _comment_idMw()...)
+				_comment_id.POST("/likes", append(_reactcoursecommentMw(), course.ReactCourseComment)...)
+			}
 		}
 		{
 			_course_ratings0 := _api.Group("/course_ratings", _course_ratings0Mw()...)

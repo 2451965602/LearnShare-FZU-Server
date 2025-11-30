@@ -21,7 +21,7 @@ CREATE TABLE `permissions` (
                                `description` VARCHAR(500) DEFAULT NULL COMMENT '权限描述',
                                PRIMARY KEY (`permission_id`),
                                UNIQUE KEY `uk_permission_name` (`permission_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='权限表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='权限表';
 
 -- ----------------------------
 -- 角色表 (roles) - 使用 SMALLINT 节省空间
@@ -33,7 +33,7 @@ CREATE TABLE `roles` (
                          `description` VARCHAR(500) DEFAULT NULL COMMENT '角色描述',
                          PRIMARY KEY (`role_id`),
                          UNIQUE KEY `uk_role_name` (`role_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='角色表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='角色表';
 
 -- ----------------------------
 -- 角色-权限关联表 (role_permissions) - 内嵌外键
@@ -46,7 +46,7 @@ CREATE TABLE `role_permissions` (
                                     KEY `idx_rp_permission` (`permission_id`),
                                     CONSTRAINT `fk_rp_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE,
                                     CONSTRAINT `fk_rp_permission` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`permission_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='角色-权限关联表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='角色-权限关联表';
 
 -- ----------------------------
 -- 学院表 (colleges)
@@ -58,7 +58,7 @@ CREATE TABLE `colleges` (
                             `school` VARCHAR(100) DEFAULT NULL COMMENT '所属学校',
                             PRIMARY KEY (`college_id`),
                             UNIQUE KEY `uk_college_name` (`college_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='学院表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='学院表';
 
 -- ----------------------------
 -- 专业表 (majors) - 移除冗余索引 idx_major_name
@@ -71,7 +71,7 @@ CREATE TABLE `majors` (
                           PRIMARY KEY (`major_id`),
                           UNIQUE KEY `uk_major_college` (`major_name`,`college_id`), -- 联合唯一索引
                           CONSTRAINT `fk_major_college` FOREIGN KEY (`college_id`) REFERENCES `colleges` (`college_id`) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='专业表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='专业表';
 
 -- ----------------------------
 -- 教师表 (teachers) - 教师简介使用 TEXT, 外键 ON DELETE SET NULL
@@ -89,7 +89,7 @@ CREATE TABLE `teachers` (
                             PRIMARY KEY (`teacher_id`),
                             KEY `idx_teacher_name` (`name`),
                             CONSTRAINT `fk_teacher_college` FOREIGN KEY (`college_id`) REFERENCES `colleges` (`college_id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='教师表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='教师表';
 
 -- ----------------------------
 -- 用户表 (users) - 内嵌外键
@@ -115,7 +115,7 @@ CREATE TABLE `users` (
                          CONSTRAINT `fk_user_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE RESTRICT,
                          CONSTRAINT `fk_user_college` FOREIGN KEY (`college_id`) REFERENCES `colleges` (`college_id`) ON DELETE SET NULL,
                          CONSTRAINT `fk_user_major` FOREIGN KEY (`major_id`) REFERENCES `majors` (`major_id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户表';
 
 -- ----------------------------
 -- 课程表 (courses) - 调整学分为 DECIMAL(2,1) 更精确
@@ -136,7 +136,7 @@ CREATE TABLE `courses` (
                            KEY `idx_course_teacher_major` (`teacher_id`,`major_id`),
                            CONSTRAINT `fk_course_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`teacher_id`) ON DELETE SET NULL,
                            CONSTRAINT `fk_course_major` FOREIGN KEY (`major_id`) REFERENCES `majors` (`major_id`) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='课程表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='课程表';
 
 -- ----------------------------
 -- 标签表 (tags)
@@ -147,7 +147,7 @@ CREATE TABLE `tags` (
                         `tag_name` VARCHAR(50) NOT NULL COMMENT '标签名称',
                         PRIMARY KEY (`tag_id`),
                         UNIQUE KEY `uk_tag_name` (`tag_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='标签表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='标签表';
 
 -- ----------------------------
 -- 资源表 (resources) - 内嵌外键
@@ -174,7 +174,7 @@ CREATE TABLE `resources` (
                              KEY `idx_res_course_status` (`course_id`,`status`),
                              CONSTRAINT `fk_resource_uploader` FOREIGN KEY (`uploader_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
                              CONSTRAINT `fk_resource_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`course_id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='资源表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='资源表';
 
 -- ----------------------------
 -- 资源标签关联表 (resource_tags) - 内嵌外键
@@ -187,7 +187,7 @@ CREATE TABLE `resource_tags` (
                                  KEY `fk_rt_tag` (`tag_id`),
                                  CONSTRAINT `fk_rt_resource` FOREIGN KEY (`resource_id`) REFERENCES `resources` (`resource_id`) ON DELETE CASCADE,
                                  CONSTRAINT `fk_rt_tag` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`tag_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='资源标签关联表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='资源标签关联表';
 
 -- ----------------------------
 -- 课程评分表 (course_ratings) - 评分子项使用 TINYINT
@@ -209,7 +209,7 @@ CREATE TABLE `course_ratings` (
                                   KEY `idx_cr_course_visible` (`course_id`,`is_visible`),
                                   CONSTRAINT `fk_cr_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
                                   CONSTRAINT `fk_cr_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`course_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='课程评分表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='课程评分表';
 
 -- ----------------------------
 -- 课程评论表 (course_comments) - 内嵌外键
@@ -232,7 +232,25 @@ CREATE TABLE `course_comments` (
                                    CONSTRAINT `fk_cc_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
                                    CONSTRAINT `fk_cc_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`course_id`) ON DELETE CASCADE,
                                    CONSTRAINT `fk_cc_parent` FOREIGN KEY (`parent_id`) REFERENCES `course_comments` (`comment_id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='课程评论表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='课程评论表';
+
+
+-- ----------------------------
+-- 课程评论反应表 (course_comment_reactions)
+-- ----------------------------
+DROP TABLE IF EXISTS `course_comment_reactions`;
+CREATE TABLE `course_comment_reactions` (
+    `reaction_id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '反应ID',
+    `user_id` INT UNSIGNED NOT NULL COMMENT '用户ID',
+    `comment_id` INT UNSIGNED NOT NULL COMMENT '课程评论ID',
+    `reaction` ENUM('like','dislike') NOT NULL COMMENT '反应类型',
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    PRIMARY KEY (`reaction_id`),
+    UNIQUE KEY `uk_ccr_user_comment` (`user_id`, `comment_id`) COMMENT '确保用户对同一评论仅有一个反应',
+    KEY `idx_ccr_comment_reaction` (`comment_id`, `reaction`) COMMENT '加速按评论和反应类型查询',
+    CONSTRAINT `fk_ccr_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_ccr_comment` FOREIGN KEY (`comment_id`) REFERENCES `course_comments` (`comment_id`) ON DELETE CASCADE
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='课程评论反应表（点赞/点踩）';
 
 -- ----------------------------
 -- 资源评分表 (resource_ratings)
@@ -251,7 +269,7 @@ CREATE TABLE `resource_ratings` (
                                     KEY `idx_rr_resource_visible` (`resource_id`,`is_visible`),
                                     CONSTRAINT `fk_rr_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
                                     CONSTRAINT `fk_rr_resource` FOREIGN KEY (`resource_id`) REFERENCES `resources` (`resource_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='资源评分表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='资源评分表';
 
 -- ----------------------------
 -- 资源评论表 (resource_comments)
@@ -274,7 +292,7 @@ CREATE TABLE `resource_comments` (
                                      CONSTRAINT `fk_rc_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
                                      CONSTRAINT `fk_rc_resource` FOREIGN KEY (`resource_id`) REFERENCES `resources` (`resource_id`) ON DELETE CASCADE,
                                      CONSTRAINT `fk_rc_parent` FOREIGN KEY (`parent_id`) REFERENCES `resource_comments` (`comment_id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='资源评论表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='资源评论表';
 
 -- ----------------------------
 -- 资源评论反应表 (resource_comment_reactions)
@@ -291,7 +309,7 @@ CREATE TABLE `resource_comment_reactions` (
                                      KEY `idx_rcr_comment_reaction` (`comment_id`,`reaction`),
                                      CONSTRAINT `fk_rcr_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
                                      CONSTRAINT `fk_rcr_comment` FOREIGN KEY (`comment_id`) REFERENCES `resource_comments` (`comment_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='资源评论反应表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='资源评论反应表';
 
 -- ----------------------------
 -- 信誉分记录表 (reputation_records) - 调整 change_score 为 SMALLINT
@@ -308,7 +326,7 @@ CREATE TABLE `reputation_records` (
                                       PRIMARY KEY (`record_id`),
                                       KEY `idx_reputation_time` (`created_at`),
                                       CONSTRAINT `fk_reprec_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='信誉分记录表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='信誉分记录表';
 
 -- ----------------------------
 -- 收藏表 (favorites)
@@ -324,7 +342,7 @@ CREATE TABLE `favorites` (
                              UNIQUE KEY `uk_user_target` (`user_id`,`target_id`,`target_type`),
                              KEY `idx_favorite_type` (`user_id`,`target_type`),
                              CONSTRAINT `fk_favorite_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='收藏表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='收藏表';
 
 -- ----------------------------
 -- 审核表 (reviews) - 优化状态和优先级索引，新增举报人外键
@@ -346,7 +364,7 @@ CREATE TABLE `reviews` (
                            KEY `idx_review_target` (`target_type`,`target_id`),
                            CONSTRAINT `fk_review_reporter` FOREIGN KEY (`reporter_id`) REFERENCES `users` (`user_id`) ON DELETE RESTRICT,
                            CONSTRAINT `fk_review_reviewer` FOREIGN KEY (`reviewer_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='审核表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='审核表';
 
 -- ----------------------------
 -- 物品表 (items)
@@ -361,7 +379,7 @@ CREATE TABLE `items` (
                          `image_url` VARCHAR(255) DEFAULT NULL COMMENT '预览图URL',
                          PRIMARY KEY (`item_id`),
                          UNIQUE KEY `uk_item_name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物品表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='物品表';
 
 -- ----------------------------
 -- 用户物品表 (user_items) - 新增查询启用状态的索引
@@ -378,7 +396,7 @@ CREATE TABLE `user_items` (
                               KEY `idx_ui_user_used` (`user_id`, `is_used`),
                               CONSTRAINT `fk_ui_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
                               CONSTRAINT `fk_ui_item` FOREIGN KEY (`item_id`) REFERENCES `items` (`item_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户物品表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='用户物品表';
 
 
 -- ----------------------------

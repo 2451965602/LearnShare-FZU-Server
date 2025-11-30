@@ -223,3 +223,27 @@ func DeleteCourseRating(ctx context.Context, c *app.RequestContext) {
 
 	pack.SendResponse(c, resp)
 }
+
+// ReactCourseComment .
+// @router /api/course_comments/:comment_id/likes [POST]
+func ReactCourseComment(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req course.SubmitCourseCommentReactionReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp := new(course.SubmitCourseCommentReactionResp)
+
+	if e := service.NewCourseService(ctx, c).ReactCourseComment(req.CommentID, req.Action); e != nil {
+		pack.BuildFailResponse(c, e)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+
+	pack.SendResponse(c, resp)
+
+}

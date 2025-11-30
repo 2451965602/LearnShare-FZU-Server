@@ -99,6 +99,15 @@ struct DeleteCourseRatingResp {
   required model.BaseResp baseResponse;
 }
 
+struct SubmitCourseCommentReactionReq {
+    1: required i64 comment_id (api.path="comment_id"),
+    2: required string action (api.body="action"),  // 例如 "like" 或 "dislike"
+}
+
+struct SubmitCourseCommentReactionResp {
+    1: required model.BaseResp baseResp,
+}
+
 service CourseService {
   SearchResp search(1: SearchReq req)(api.get="/api/courses/search"),
   GetCourseDetailResp getCourseDetail(1: GetCourseDetailReq req)(api.get="/api/courses/:course_id"),
@@ -108,6 +117,8 @@ service CourseService {
   SubmitCourseCommentResp submitCourseComment(1: SubmitCourseCommentReq req)(api.post="/api/course_comments/:course_id"),
   DeleteCourseCommentResp deleteCourseComment(1: DeleteCourseCommentReq req)(api.delete="/api/courses_comments/:comment_id"),
   DeleteCourseRatingResp deleteCourseRating(1: DeleteCourseRatingReq req)(api.delete="/api/course_ratings/:rating_id"),
+
+  SubmitCourseCommentReactionResp reactCourseComment(  1: SubmitCourseCommentReactionReq req)(api.post="/api/course_comments/:comment_id/likes"),
 }
 
 struct AdminDeleteCourseCommentReq{
@@ -137,3 +148,8 @@ service AdminCourseService{
     AdminDeleteCourseResp AdminDeleteCourse(1:AdminDeleteCourseReq req)(api.delete="/api/admin/courses/:course_id"),
 
 }
+
+
+
+
+

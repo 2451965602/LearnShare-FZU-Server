@@ -202,6 +202,25 @@ func (s *CourseService) DeleteCourseRating(req *course.DeleteCourseRatingReq) er
 	return nil
 }
 
+func (s *CourseService) ReactCourseComment(commentID int64, action string) error {
+	if commentID <= 0 {
+		return errno.ParamVerifyError
+	}
+	switch action {
+	case "like", "dislike", "cancel_like", "cancel_dislike":
+	default:
+		return errno.ParamVerifyError.WithMessage("操作类型无效")
+	}
+
+	userID := GetUidFormContext(s.c)
+
+	errChan := db.ReactCourseCommentAsync(s.ctx, userID, commentID, action)
+	if err := <-errChan; err != nil {
+		return err
+	}
+	return nil
+}
+
 // AdminDeleteCourse 管理员硬删除课程（包括关联资源、评论、评分等）
 func (s *CourseService) AdminDeleteCourse(req *course.AdminDeleteCourseReq) error {
 	if req.CourseID <= 0 {

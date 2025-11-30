@@ -121,3 +121,13 @@ func _courses0Mw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _comment_idMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _reactcoursecommentMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
