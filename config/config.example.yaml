@@ -42,10 +42,6 @@ logger:
   dir: "logs"    # 日志文件存储目录
   env: "development"
 
-image_generate:
-  c_key: "xlsx"
-  id1: "漫画体"
-
 cors:
   allow_origins:
     - "http://*.yourang.top"

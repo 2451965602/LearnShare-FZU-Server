@@ -8,17 +8,16 @@ import (
 )
 
 var (
-	Mysql         *mySQL
-	Redis         *redis
-	Oss           *oss
-	Smtp          *smtp
-	Verify        *verify
-	Server        *server
-	Turnstile     *turnstile
-	Logger        *logger
-	Cors          *cors
-	ImageGenerate *imageGenerate
-	runtimeViper  = viper.New()
+	Mysql        *mySQL
+	Redis        *redis
+	Oss          *oss
+	Smtp         *smtp
+	Verify       *verify
+	Server       *server
+	Turnstile    *turnstile
+	Logger       *logger
+	Cors         *cors
+	runtimeViper = viper.New()
 )
 
 // Init 目的是初始化配置管理器
@@ -59,5 +58,4 @@ func configMapping() {
 	Turnstile = &c.Turnstile
 	Logger = &c.Logger
 	Cors = &c.Cors
-	ImageGenerate = &c.ImageGenerate
 }
