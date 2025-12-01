@@ -74,7 +74,6 @@ struct Resource {
     required i64 resourceId,
     required string title,              // 资源标题
     optional string description,        // 资源描述
-    required string filePath,           // 文件路径
     required string fileType,           // 文件类型 (.pdf, .docx, .pptx, .zip)
     required i64 fileSize,             // 文件大小 (bytes)
     required i64 uploaderId,           // 上传者ID

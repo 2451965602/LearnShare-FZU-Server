@@ -3345,28 +3345,26 @@ type Resource struct {
 	Title string `thrift:"title,2,required" form:"title,required" json:"title,required" query:"title,required"`
 	// 资源描述
 	Description *string `thrift:"description,3,optional" form:"description" json:"description,omitempty" query:"description"`
-	// 文件路径
-	FilePath string `thrift:"filePath,4,required" form:"filePath,required" json:"filePath,required" query:"filePath,required"`
 	// 文件类型 (.pdf, .docx, .pptx, .zip)
-	FileType string `thrift:"fileType,5,required" form:"fileType,required" json:"fileType,required" query:"fileType,required"`
+	FileType string `thrift:"fileType,4,required" form:"fileType,required" json:"fileType,required" query:"fileType,required"`
 	// 文件大小 (bytes)
-	FileSize int64 `thrift:"fileSize,6,required" form:"fileSize,required" json:"fileSize,required" query:"fileSize,required"`
+	FileSize int64 `thrift:"fileSize,5,required" form:"fileSize,required" json:"fileSize,required" query:"fileSize,required"`
 	// 上传者ID
-	UploaderId int64 `thrift:"uploaderId,7,required" form:"uploaderId,required" json:"uploaderId,required" query:"uploaderId,required"`
+	UploaderId int64 `thrift:"uploaderId,6,required" form:"uploaderId,required" json:"uploaderId,required" query:"uploaderId,required"`
 	// 关联课程ID
-	CourseId int64 `thrift:"courseId,8,required" form:"courseId,required" json:"courseId,required" query:"courseId,required"`
+	CourseId int64 `thrift:"courseId,7,required" form:"courseId,required" json:"courseId,required" query:"courseId,required"`
 	// 下载次数
-	DownloadCount int64 `thrift:"downloadCount,9,required" form:"downloadCount,required" json:"downloadCount,required" query:"downloadCount,required"`
+	DownloadCount int64 `thrift:"downloadCount,8,required" form:"downloadCount,required" json:"downloadCount,required" query:"downloadCount,required"`
 	// 平均评分
-	AverageRating float64 `thrift:"averageRating,10,required" form:"averageRating,required" json:"averageRating,required" query:"averageRating,required"`
+	AverageRating float64 `thrift:"averageRating,9,required" form:"averageRating,required" json:"averageRating,required" query:"averageRating,required"`
 	// 评分数量
-	RatingCount int64 `thrift:"ratingCount,11,required" form:"ratingCount,required" json:"ratingCount,required" query:"ratingCount,required"`
+	RatingCount int64 `thrift:"ratingCount,10,required" form:"ratingCount,required" json:"ratingCount,required" query:"ratingCount,required"`
 	// 资源状态 (0:待审核, 1:已发布, 2:已拒绝)
-	Status int32 `thrift:"status,12,required" form:"status,required" json:"status,required" query:"status,required"`
+	Status int32 `thrift:"status,11,required" form:"status,required" json:"status,required" query:"status,required"`
 	// 创建时间
-	CreatedAt int64 `thrift:"createdAt,13,required" form:"createdAt,required" json:"createdAt,required" query:"createdAt,required"`
+	CreatedAt int64 `thrift:"createdAt,12,required" form:"createdAt,required" json:"createdAt,required" query:"createdAt,required"`
 	// 资源标签
-	Tags []*ResourceTag `thrift:"tags,14,optional,list<ResourceTag>" form:"tags" json:"tags,omitempty" query:"tags"`
+	Tags []*ResourceTag `thrift:"tags,13,optional,list<ResourceTag>" form:"tags" json:"tags,omitempty" query:"tags"`
 }
 
 func NewResource() *Resource {
@@ -3391,10 +3389,6 @@ func (p *Resource) GetDescription() (v string) {
 		return Resource_Description_DEFAULT
 	}
 	return *p.Description
-}
-
-func (p *Resource) GetFilePath() (v string) {
-	return p.FilePath
 }
 
 func (p *Resource) GetFileType() (v string) {
@@ -3446,17 +3440,16 @@ var fieldIDToName_Resource = map[int16]string{
 	1:  "resourceId",
 	2:  "title",
 	3:  "description",
-	4:  "filePath",
-	5:  "fileType",
-	6:  "fileSize",
-	7:  "uploaderId",
-	8:  "courseId",
-	9:  "downloadCount",
-	10: "averageRating",
-	11: "ratingCount",
-	12: "status",
-	13: "createdAt",
-	14: "tags",
+	4:  "fileType",
+	5:  "fileSize",
+	6:  "uploaderId",
+	7:  "courseId",
+	8:  "downloadCount",
+	9:  "averageRating",
+	10: "ratingCount",
+	11: "status",
+	12: "createdAt",
+	13: "tags",
 }
 
 func (p *Resource) IsSetDescription() bool {
@@ -3473,7 +3466,6 @@ func (p *Resource) Read(iprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	var issetResourceId bool = false
 	var issetTitle bool = false
-	var issetFilePath bool = false
 	var issetFileType bool = false
 	var issetFileSize bool = false
 	var issetUploaderId bool = false
@@ -3529,16 +3521,16 @@ func (p *Resource) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetFilePath = true
+				issetFileType = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
 		case 5:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetFileType = true
+				issetFileSize = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -3547,7 +3539,7 @@ func (p *Resource) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField6(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetFileSize = true
+				issetUploaderId = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -3556,7 +3548,7 @@ func (p *Resource) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField7(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetUploaderId = true
+				issetCourseId = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -3565,58 +3557,49 @@ func (p *Resource) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField8(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetCourseId = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 9:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField9(iprot); err != nil {
-					goto ReadFieldError
-				}
 				issetDownloadCount = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 10:
+		case 9:
 			if fieldTypeId == thrift.DOUBLE {
-				if err = p.ReadField10(iprot); err != nil {
+				if err = p.ReadField9(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetAverageRating = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 11:
+		case 10:
 			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField11(iprot); err != nil {
+				if err = p.ReadField10(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetRatingCount = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 12:
+		case 11:
 			if fieldTypeId == thrift.I32 {
-				if err = p.ReadField12(iprot); err != nil {
+				if err = p.ReadField11(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetStatus = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 13:
+		case 12:
 			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField13(iprot); err != nil {
+				if err = p.ReadField12(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetCreatedAt = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 14:
+		case 13:
 			if fieldTypeId == thrift.LIST {
-				if err = p.ReadField14(iprot); err != nil {
+				if err = p.ReadField13(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
@@ -3645,53 +3628,48 @@ func (p *Resource) Read(iprot thrift.TProtocol) (err error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetFilePath {
+	if !issetFileType {
 		fieldId = 4
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetFileType {
+	if !issetFileSize {
 		fieldId = 5
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetFileSize {
+	if !issetUploaderId {
 		fieldId = 6
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetUploaderId {
+	if !issetCourseId {
 		fieldId = 7
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetCourseId {
+	if !issetDownloadCount {
 		fieldId = 8
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetDownloadCount {
+	if !issetAverageRating {
 		fieldId = 9
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetAverageRating {
+	if !issetRatingCount {
 		fieldId = 10
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetRatingCount {
+	if !issetStatus {
 		fieldId = 11
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetStatus {
-		fieldId = 12
-		goto RequiredFieldNotSetError
-	}
-
 	if !issetCreatedAt {
-		fieldId = 13
+		fieldId = 12
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -3753,21 +3731,10 @@ func (p *Resource) ReadField4(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.FilePath = _field
-	return nil
-}
-func (p *Resource) ReadField5(iprot thrift.TProtocol) error {
-
-	var _field string
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
 	p.FileType = _field
 	return nil
 }
-func (p *Resource) ReadField6(iprot thrift.TProtocol) error {
+func (p *Resource) ReadField5(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -3778,7 +3745,7 @@ func (p *Resource) ReadField6(iprot thrift.TProtocol) error {
 	p.FileSize = _field
 	return nil
 }
-func (p *Resource) ReadField7(iprot thrift.TProtocol) error {
+func (p *Resource) ReadField6(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -3789,7 +3756,7 @@ func (p *Resource) ReadField7(iprot thrift.TProtocol) error {
 	p.UploaderId = _field
 	return nil
 }
-func (p *Resource) ReadField8(iprot thrift.TProtocol) error {
+func (p *Resource) ReadField7(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -3800,7 +3767,7 @@ func (p *Resource) ReadField8(iprot thrift.TProtocol) error {
 	p.CourseId = _field
 	return nil
 }
-func (p *Resource) ReadField9(iprot thrift.TProtocol) error {
+func (p *Resource) ReadField8(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -3811,7 +3778,7 @@ func (p *Resource) ReadField9(iprot thrift.TProtocol) error {
 	p.DownloadCount = _field
 	return nil
 }
-func (p *Resource) ReadField10(iprot thrift.TProtocol) error {
+func (p *Resource) ReadField9(iprot thrift.TProtocol) error {
 
 	var _field float64
 	if v, err := iprot.ReadDouble(); err != nil {
@@ -3822,7 +3789,7 @@ func (p *Resource) ReadField10(iprot thrift.TProtocol) error {
 	p.AverageRating = _field
 	return nil
 }
-func (p *Resource) ReadField11(iprot thrift.TProtocol) error {
+func (p *Resource) ReadField10(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -3833,7 +3800,7 @@ func (p *Resource) ReadField11(iprot thrift.TProtocol) error {
 	p.RatingCount = _field
 	return nil
 }
-func (p *Resource) ReadField12(iprot thrift.TProtocol) error {
+func (p *Resource) ReadField11(iprot thrift.TProtocol) error {
 
 	var _field int32
 	if v, err := iprot.ReadI32(); err != nil {
@@ -3844,7 +3811,7 @@ func (p *Resource) ReadField12(iprot thrift.TProtocol) error {
 	p.Status = _field
 	return nil
 }
-func (p *Resource) ReadField13(iprot thrift.TProtocol) error {
+func (p *Resource) ReadField12(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -3855,7 +3822,7 @@ func (p *Resource) ReadField13(iprot thrift.TProtocol) error {
 	p.CreatedAt = _field
 	return nil
 }
-func (p *Resource) ReadField14(iprot thrift.TProtocol) error {
+func (p *Resource) ReadField13(iprot thrift.TProtocol) error {
 	_, size, err := iprot.ReadListBegin()
 	if err != nil {
 		return err
@@ -3937,10 +3904,6 @@ func (p *Resource) Write(oprot thrift.TProtocol) (err error) {
 			fieldId = 13
 			goto WriteFieldError
 		}
-		if err = p.writeField14(oprot); err != nil {
-			fieldId = 14
-			goto WriteFieldError
-		}
 	}
 	if err = oprot.WriteFieldStop(); err != nil {
 		goto WriteFieldStopError
@@ -4013,10 +3976,10 @@ WriteFieldEndError:
 }
 
 func (p *Resource) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("filePath", thrift.STRING, 4); err != nil {
+	if err = oprot.WriteFieldBegin("fileType", thrift.STRING, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.FilePath); err != nil {
+	if err := oprot.WriteString(p.FileType); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -4030,10 +3993,10 @@ WriteFieldEndError:
 }
 
 func (p *Resource) writeField5(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("fileType", thrift.STRING, 5); err != nil {
+	if err = oprot.WriteFieldBegin("fileSize", thrift.I64, 5); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.FileType); err != nil {
+	if err := oprot.WriteI64(p.FileSize); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -4047,10 +4010,10 @@ WriteFieldEndError:
 }
 
 func (p *Resource) writeField6(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("fileSize", thrift.I64, 6); err != nil {
+	if err = oprot.WriteFieldBegin("uploaderId", thrift.I64, 6); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.FileSize); err != nil {
+	if err := oprot.WriteI64(p.UploaderId); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -4064,10 +4027,10 @@ WriteFieldEndError:
 }
 
 func (p *Resource) writeField7(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("uploaderId", thrift.I64, 7); err != nil {
+	if err = oprot.WriteFieldBegin("courseId", thrift.I64, 7); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.UploaderId); err != nil {
+	if err := oprot.WriteI64(p.CourseId); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -4081,10 +4044,10 @@ WriteFieldEndError:
 }
 
 func (p *Resource) writeField8(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("courseId", thrift.I64, 8); err != nil {
+	if err = oprot.WriteFieldBegin("downloadCount", thrift.I64, 8); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.CourseId); err != nil {
+	if err := oprot.WriteI64(p.DownloadCount); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -4098,10 +4061,10 @@ WriteFieldEndError:
 }
 
 func (p *Resource) writeField9(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("downloadCount", thrift.I64, 9); err != nil {
+	if err = oprot.WriteFieldBegin("averageRating", thrift.DOUBLE, 9); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.DownloadCount); err != nil {
+	if err := oprot.WriteDouble(p.AverageRating); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -4115,10 +4078,10 @@ WriteFieldEndError:
 }
 
 func (p *Resource) writeField10(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("averageRating", thrift.DOUBLE, 10); err != nil {
+	if err = oprot.WriteFieldBegin("ratingCount", thrift.I64, 10); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteDouble(p.AverageRating); err != nil {
+	if err := oprot.WriteI64(p.RatingCount); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -4132,10 +4095,10 @@ WriteFieldEndError:
 }
 
 func (p *Resource) writeField11(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("ratingCount", thrift.I64, 11); err != nil {
+	if err = oprot.WriteFieldBegin("status", thrift.I32, 11); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.RatingCount); err != nil {
+	if err := oprot.WriteI32(p.Status); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -4149,10 +4112,10 @@ WriteFieldEndError:
 }
 
 func (p *Resource) writeField12(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("status", thrift.I32, 12); err != nil {
+	if err = oprot.WriteFieldBegin("createdAt", thrift.I64, 12); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.Status); err != nil {
+	if err := oprot.WriteI64(p.CreatedAt); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -4166,25 +4129,8 @@ WriteFieldEndError:
 }
 
 func (p *Resource) writeField13(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("createdAt", thrift.I64, 13); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI64(p.CreatedAt); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 13 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 13 end error: ", p), err)
-}
-
-func (p *Resource) writeField14(oprot thrift.TProtocol) (err error) {
 	if p.IsSetTags() {
-		if err = oprot.WriteFieldBegin("tags", thrift.LIST, 14); err != nil {
+		if err = oprot.WriteFieldBegin("tags", thrift.LIST, 13); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Tags)); err != nil {
@@ -4204,9 +4150,9 @@ func (p *Resource) writeField14(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 14 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 13 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 14 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 13 end error: ", p), err)
 }
 
 func (p *Resource) String() string {
