@@ -160,33 +160,30 @@ func (s *CourseService) SubmitCourseRating(req *course.SubmitCourseRatingReq) (*
 		IsVisible:      true,
 	}
 
-    saved, err := db.SubmitCourseRating(s.ctx, rating)
-    if err != nil {
-        return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交课程评分失败: "+err.Error())
-    }
+	saved, err := db.SubmitCourseRating(s.ctx, rating)
+	if err != nil {
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交课程评分失败: "+err.Error())
+	}
 
-    return saved.ToCourseRatingModule(), nil
+	return saved.ToCourseRatingModule(), nil
 }
 
 func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) (*module.CourseComment, error) {
 	// 获取用户ID
 	userID := GetUidFormContext(s.c)
 
-	isVisible := req.IsVisible
-
 	// 创建评论对象
 	var parentIDPtr *int64
-	if req.ParentID != 0 {
-		parentIDPtr = &req.ParentID
+	if *req.ParentID != 0 {
+		parentIDPtr = req.ParentID
 	}
 
 	comment := &db.CourseComment{
-		CourseID:  req.CourseID,
-		UserID:    userID,
-		Content:   req.Contents,
-		ParentID:  parentIDPtr,
-		IsVisible: isVisible,
-		Status:    "normal",
+		CourseID: req.CourseID,
+		UserID:   userID,
+		Content:  req.Contents,
+		ParentID: parentIDPtr,
+		Status:   "normal",
 	}
 
 	// 使用异步提交评论
