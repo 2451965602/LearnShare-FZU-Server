@@ -72,8 +72,7 @@ struct SubmitCourseRatingResp {
 struct SubmitCourseCommentReq {
   required i64 course_id (api.path="course_id");
   required string contents      
-  optional i64 parent_id = 0   
-  optional bool is_visible = true  
+  optional i64 parent_id
 }
 
 struct SubmitCourseCommentResp {

@@ -168,7 +168,7 @@ func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) 
 		CourseID:  req.CourseID,
 		UserID:    userID,
 		Content:   req.Contents,
-		ParentID:  parentIDPtr, // ✅ *int64
+		ParentID:  parentIDPtr,
 		IsVisible: isVisible,
 	}
 

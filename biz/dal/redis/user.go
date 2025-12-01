@@ -4,6 +4,7 @@ import (
 	"LearnShare/biz/dal/db"
 	"LearnShare/pkg/errno"
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -69,19 +70,32 @@ func IsBlacklistToken(ctx context.Context, token string) (bool, error) {
 	return false, nil
 }
 
+// SetUserInfoCache 将用户信息序列化为 JSON 后写入缓存，使用前缀 key
 func SetUserInfoCache(ctx context.Context, userId string, data *db.User, expiration time.Duration) error {
-	err := RDB.Set(ctx, userId, data, expiration).Err()
+	b, err := json.Marshal(data)
 	if err != nil {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, "序列化用户信息失败: "+err.Error())
+	}
+	key := fmt.Sprintf("user:%s", userId)
+	if err := RDB.Set(ctx, key, b, expiration).Err(); err != nil {
 		return errno.NewErrNo(errno.InternalRedisErrorCode, "设置用户信息缓存失败: "+err.Error())
 	}
 	return nil
 }
 
+// GetUserInfoCache 从缓存读取 JSON 并反序列化为 db.User，缓存未命中返回 (nil, nil)
 func GetUserInfoCache(ctx context.Context, userId string) (*db.User, error) {
-	var user db.User
-	err := RDB.Get(ctx, userId).Scan(&user)
+	key := fmt.Sprintf("user:%s", userId)
+	val, err := RDB.Get(ctx, key).Result()
 	if err != nil {
+		if err.Error() == "redis: nil" {
+			return nil, nil
+		}
 		return nil, errno.NewErrNo(errno.InternalRedisErrorCode, "获取用户信息缓存失败: "+err.Error())
+	}
+	var user db.User
+	if err := json.Unmarshal([]byte(val), &user); err != nil {
+		return nil, errno.NewErrNo(errno.InternalRedisErrorCode, "解析用户信息缓存失败: "+err.Error())
 	}
 	return &user, nil
 }
