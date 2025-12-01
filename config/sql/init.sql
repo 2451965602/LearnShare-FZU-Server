@@ -3,7 +3,7 @@
 -- ------------------------------------------------------------
 -- 禁用外键检查，并设置字符集
 SET
-    @OLD_FOREIGN_KEY_CHECKS = @ @FOREIGN_KEY_CHECKS;
+    @OLD_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS;
 
 SET
     FOREIGN_KEY_CHECKS = 0;
