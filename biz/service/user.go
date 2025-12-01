@@ -334,7 +334,7 @@ func (s *UserService) GetUserInfo(req *user.GetUserInfoReq) (*module.User, error
 		return nil, err
 	}
 	if userInfo == nil {
-		return nil, errno.ServiceUserNotExist
+		return nil, errno.NewErrNo(errno.ServiceUserNotExist, "用户不存在")
 	}
 
 	if err = redis.SetUserInfoCache(s.ctx, key, userInfo, 12*time.Hour); err != nil {
