@@ -11,13 +11,10 @@ import (
 	"image"
 	"image/color"
 	"image/png"
-	"io"
-	"net/http"
 	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/fogleman/gg"
-	"github.com/golang/freetype/truetype"
 )
 
 type CourseService struct {
@@ -273,28 +270,14 @@ func (s *CourseService) GetCourseImage(name string) (string, error) {
 	dc.DrawRectangle(0, 0, float64(width), float64(height))
 	dc.Fill()
 
-	// 下载在线字体
-	resp, err := http.Get("https://github.com/googlefonts/noto-cjk/raw/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Bold.otf")
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	fontBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	font, err := truetype.Parse(fontBytes)
-	if err != nil {
-		return "", err
-	}
-
-	face := truetype.NewFace(font, &truetype.Options{Size: 80})
-	dc.SetFontFace(face)
-
 	// 绘制文字阴影
-	dc.SetColor(color.RGBA{0, 0, 0, 100})
+
+	err := dc.LoadFontFace("config/font/msyh.ttc", 80)
+	if err != nil {
+		return "", err
+	}
+
+	dc.SetColor(color.RGBA{A: 100})
 	dc.DrawStringAnchored(name, width/2+4, height/2+4, 0.5, 0.5)
 
 	// 绘制主文字
