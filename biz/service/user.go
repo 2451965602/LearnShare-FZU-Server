@@ -315,20 +315,35 @@ func (s *UserService) GetUserInfo(req *user.GetUserInfoReq) (*module.User, error
 		err      error
 	)
 
-	if redis.IsKeyExist(s.ctx, strconv.FormatInt(req.UserID, 10)) {
-		userInfo, err = redis.GetUserInfoCache(s.ctx, strconv.FormatInt(req.UserID, 10))
+	key := strconv.FormatInt(req.UserID, 10)
+
+	if redis.IsKeyExist(s.ctx, key) {
+		userInfo, err = redis.GetUserInfoCache(s.ctx, key)
 		if err != nil {
 			return nil, err
 		}
-	} else {
-		userInfo, err = db.GetUserByID(s.ctx, req.UserID)
-		if err != nil {
-			return nil, err
+		if userInfo != nil {
+			return userInfo.ToUserModule(), nil
 		}
-		err = redis.SetUserInfoCache(s.ctx, strconv.FormatInt(req.UserID, 10), userInfo, 12*time.Hour)
-		if err != nil {
-			return nil, err
-		}
+		// 缓存命中但返回 nil，记录并回退到 DB
+		logger.WithFields(zap.String("key", key)).Warn("缓存命中但返回 nil 用户信息，回退到数据库查询")
 	}
+
+	userInfo, err = db.GetUserByID(s.ctx, req.UserID)
+	if err != nil {
+		return nil, err
+	}
+	if userInfo == nil {
+		return nil, errno.ServiceUserNotExist
+	}
+
+	if err = redis.SetUserInfoCache(s.ctx, key, userInfo, 12*time.Hour); err != nil {
+		logger.WithFields(
+			zap.Int64("user_id", req.UserID),
+			zap.Error(err),
+		).Warn("设置用户缓存失败")
+		// 不阻塞，仍返回用户信息
+	}
+
 	return userInfo.ToUserModule(), nil
 }
