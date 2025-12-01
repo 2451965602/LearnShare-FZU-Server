@@ -131,3 +131,8 @@ func _reactcoursecommentMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _getcourseimageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

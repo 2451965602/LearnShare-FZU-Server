@@ -64,14 +64,19 @@ type cors struct {
 	AllowWildcard bool     `mapstructure:"allow_wildcard"`
 }
 
+type imageGenerate struct {
+	CKey string `mapstructure:"c_key"`
+	Id1  string `mapstructure:"id1"`
+}
 type config struct {
-	MySQL     mySQL
-	Redis     redis
-	OSS       oss
-	Smtp      smtp   `mapstructure:"smtp"`
-	Verify    verify `mapstructure:"verify"`
-	Server    server
-	Turnstile turnstile `mapstructure:"turnstile"`
-	Logger    logger    `mapstructure:"logger"`
-	Cors      cors      `mapstructure:"cors"`
+	MySQL         mySQL
+	Redis         redis
+	OSS           oss
+	Smtp          smtp   `mapstructure:"smtp"`
+	Verify        verify `mapstructure:"verify"`
+	Server        server
+	Turnstile     turnstile     `mapstructure:"turnstile"`
+	Logger        logger        `mapstructure:"logger"`
+	Cors          cors          `mapstructure:"cors"`
+	ImageGenerate imageGenerate `mapstructure:"image_generate"`
 }

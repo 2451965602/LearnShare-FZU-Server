@@ -247,3 +247,27 @@ func ReactCourseComment(ctx context.Context, c *app.RequestContext) {
 	pack.SendResponse(c, resp)
 
 }
+
+// GetCourseImage .
+// @router /api/course [GET]
+func GetCourseImage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req course.GetCourseImageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp := new(course.GetCourseImageResp)
+	data, err := service.NewCourseService(ctx, c).GetCourseImage(req.CourseName)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+	resp.URL = data
+
+	pack.SendResponse(c, resp)
+}

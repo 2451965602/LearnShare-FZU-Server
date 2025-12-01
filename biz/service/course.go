@@ -4,8 +4,13 @@ import (
 	"LearnShare/biz/dal/db"
 	"LearnShare/biz/model/course"
 	"LearnShare/biz/model/module"
+	"LearnShare/config"
 	"LearnShare/pkg/errno"
 	"context"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -250,4 +255,41 @@ func (s *CourseService) AdminDeleteCourseRating(req *course.AdminDeleteCourseRat
 		return err
 	}
 	return nil
+}
+
+func (s *CourseService) GetCourseImage(name string) (string, error) {
+	url := "https://api.317ak.com/api/yljk/ysqm/ysqm?ckey=" + config.ImageGenerate.CKey + "&msg=" + name + "&id1=" + config.ImageGenerate.Id1
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("request failed: status=%d body=%s", resp.StatusCode, string(body))
+	}
+
+	var payload struct {
+		URL string `json:"url"`
+	}
+	if err := json.Unmarshal(body, &payload); err != nil {
+		return "", err
+	}
+	if payload.URL == "" {
+		return "", fmt.Errorf("url not found in response")
+	}
+
+	return payload.URL, nil
 }
