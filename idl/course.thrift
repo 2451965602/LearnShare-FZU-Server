@@ -75,8 +75,7 @@ struct SubmitCourseRatingResp {
 struct SubmitCourseCommentReq {
   required i64 course_id (api.path="course_id");
   required string contents      
-  optional i64 parent_id = 0   
-  optional bool is_visible = true  
+  optional i64 parent_id
 }
 
 struct SubmitCourseCommentResp {
@@ -111,6 +110,15 @@ struct SubmitCourseCommentReactionResp {
     1: required model.BaseResp baseResp,
 }
 
+struct GetCourseImageReq{
+    required string course_name
+}
+
+struct GetCourseImageResp{
+    required  model.BaseResp baseResponse;
+    required string url
+}
+
 service CourseService {
   SearchResp search(1: SearchReq req)(api.get="/api/courses/search"),
   GetCourseDetailResp getCourseDetail(1: GetCourseDetailReq req)(api.get="/api/courses/:course_id"),
@@ -122,6 +130,8 @@ service CourseService {
   DeleteCourseRatingResp deleteCourseRating(1: DeleteCourseRatingReq req)(api.delete="/api/course_ratings/:rating_id"),
 
   SubmitCourseCommentReactionResp reactCourseComment(  1: SubmitCourseCommentReactionReq req)(api.post="/api/course_comments/:comment_id/likes"),
+
+  GetCourseImageResp GetCourseImage(1:GetCourseImageReq req)(api.get="/api/course")
 }
 
 struct AdminDeleteCourseCommentReq{

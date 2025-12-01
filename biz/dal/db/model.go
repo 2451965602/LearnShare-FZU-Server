@@ -526,6 +526,7 @@ func (c College) ToCollegeModule() *module.College {
 	return &module.College{
 		CollegeId:   c.CollegeID,
 		CollegeName: c.CollegeName,
+		School:      c.School,
 	}
 }
 

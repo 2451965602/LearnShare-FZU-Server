@@ -25,20 +25,21 @@ func Register(r *server.Hertz) {
 			_admin.POST("/majors", append(_adminaddmajorMw(), school_struct.AdminAddMajor)...)
 			_admin.POST("/teachers", append(_adminaddteacherMw(), school_struct.AdminAddTeacher)...)
 		}
-	}
-	{
-		_school := root.Group("/school", _schoolMw()...)
 		{
-			_college := _school.Group("/college", _collegeMw()...)
-			_college.GET("/list", append(_getcollegelistMw(), school_struct.GetCollegeList)...)
-		}
-		{
-			_major := _school.Group("/major", _majorMw()...)
-			_major.GET("/list", append(_getmajorlistMw(), school_struct.GetMajorList)...)
-		}
-		{
-			_teacher := _school.Group("/teacher", _teacherMw()...)
-			_teacher.GET("/list", append(_getteacherlistMw(), school_struct.GetTeacherList)...)
+			_school := _api.Group("/school", _schoolMw()...)
+			{
+				_college := _school.Group("/college", _collegeMw()...)
+				_college.GET("/list", append(_getcollegelistMw(), school_struct.GetCollegeList)...)
+			}
+			{
+				_major := _school.Group("/major", _majorMw()...)
+				_major.GET("/list", append(_getmajorlistMw(), school_struct.GetMajorList)...)
+			}
+			{
+				_teacher := _school.Group("/teacher", _teacherMw()...)
+				_teacher.GET("/detail", append(_getteacherdetailMw(), school_struct.GetTeacherDetail)...)
+				_teacher.GET("/list", append(_getteacherlistMw(), school_struct.GetTeacherList)...)
+			}
 		}
 	}
 }

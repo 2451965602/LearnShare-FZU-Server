@@ -5,10 +5,16 @@ import (
 	"LearnShare/biz/model/course"
 	"LearnShare/biz/model/module"
 	"LearnShare/pkg/errno"
+	"bytes"
 	"context"
+	"encoding/base64"
+	"image"
+	"image/color"
+	"image/png"
 	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/fogleman/gg"
 )
 
 type CourseService struct {
@@ -178,7 +184,7 @@ func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) 
 		CourseID:  req.CourseID,
 		UserID:    userID,
 		Content:   req.Contents,
-		ParentID:  parentIDPtr, // ✅ *int64
+		ParentID:  parentIDPtr,
 		IsVisible: isVisible,
 		Status:    "normal",
 	}
@@ -266,4 +272,38 @@ func (s *CourseService) AdminDeleteCourseRating(req *course.AdminDeleteCourseRat
 		return err
 	}
 	return nil
+}
+
+func (s *CourseService) GetCourseImage(name string) (string, error) {
+	const width, height = 800, 400
+	dc := gg.NewContext(width, height)
+
+	// 创建渐变背景
+	grad := gg.NewLinearGradient(0, 0, width, height)
+	grad.AddColorStop(0, color.RGBA{R: 99, G: 102, B: 241, A: 255})
+	grad.AddColorStop(1, color.RGBA{R: 168, G: 85, B: 247, A: 255})
+	dc.SetFillStyle(grad)
+	dc.DrawRectangle(0, 0, float64(width), float64(height))
+	dc.Fill()
+
+	// 绘制文字阴影
+
+	err := dc.LoadFontFace("config/font/msyh.ttc", 80)
+	if err != nil {
+		return "", err
+	}
+
+	dc.SetColor(color.RGBA{A: 100})
+	dc.DrawStringAnchored(name, width/2+4, height/2+4, 0.5, 0.5)
+
+	// 绘制主文字
+	dc.SetColor(color.White)
+	dc.DrawStringAnchored(name, width/2, height/2, 0.5, 0.5)
+
+	// 编码为base64
+	var buf bytes.Buffer
+	if err := png.Encode(&buf, dc.Image().(image.Image)); err != nil {
+		return "", err
+	}
+	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(buf.Bytes()), nil
 }

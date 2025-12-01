@@ -73,7 +73,7 @@ func (s *SchoolStructService) GetTeacherList(req *school_struct.GetTeacherListRe
 		req.PageSize = 10
 	}
 
-	teachers, total, err := db.GetTeacherListByCollegeId(s.ctx, req.MajorID, int(req.PageNum), int(req.PageSize))
+	teachers, total, err := db.GetTeacherListByCollegeId(s.ctx, req.CollegeID, int(req.PageNum), int(req.PageSize))
 	if err != nil {
 		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "获取教师列表失败: "+err.Error())
 	}
@@ -84,6 +84,15 @@ func (s *SchoolStructService) GetTeacherList(req *school_struct.GetTeacherListRe
 	}
 
 	return teacherModules, total, nil
+}
+
+func (s *SchoolStructService) GetTeacherDetail(req *school_struct.GetTeacherDetailReq) (*module.Teacher, error) {
+	teacher, err := db.GetTeacherByID(s.ctx, req.TeacherID)
+	if err != nil {
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "获取教师详情失败: "+err.Error())
+	}
+
+	return teacher.ToTeacherModule(), nil
 }
 
 // AdminAddCollege 管理员添加学院

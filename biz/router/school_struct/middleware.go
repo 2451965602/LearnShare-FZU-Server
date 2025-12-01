@@ -70,3 +70,8 @@ func _getteacherlistMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _getteacherdetailMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

@@ -170,6 +170,7 @@ func GenerateAccessToken(c *app.RequestContext) {
 }
 
 func IsAccessTokenAvailable(ctx context.Context, c *app.RequestContext) error {
+	logger.Info("111")
 	claims, err := AccessTokenJwtMiddleware.GetClaimsFromJWT(ctx, c)
 	if err != nil {
 		token := c.Request.Header.Get("Authorization")
@@ -207,6 +208,7 @@ func IsAccessTokenAvailable(ctx context.Context, c *app.RequestContext) error {
 		c.Set(constants.IdentityKey, identity.(*JwtCustomClaims).UserId)
 		c.Set(constants.UUID, identity.(*JwtCustomClaims).UUID)
 		c.Set(constants.RoleID, identity.(*JwtCustomClaims).RoleId)
+		logger.Info("222")
 	}
 	if !AccessTokenJwtMiddleware.Authorizator(identity, ctx, c) {
 		return errno.AuthInvalid

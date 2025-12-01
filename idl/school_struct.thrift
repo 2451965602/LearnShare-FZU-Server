@@ -8,6 +8,7 @@ struct GetCollegeListReq {
 struct GetCollegeListResp {
      required i64 total
      required list<model.College> college_list
+     required model.BaseResp base_resp,
 }
 
 struct GetMajorListReq {
@@ -18,22 +19,33 @@ struct GetMajorListReq {
 struct GetMajorListResp {
      required i64 total
      required list<model.Major> major_list
+     required model.BaseResp base_resp,
 }
 
 struct GetTeacherListReq {
-    required i64 major_id
+    required i64 college_id
     required i64 page_num
     required i64 page_size
 }
 struct GetTeacherListResp {
+    required model.BaseResp base_resp,
      required i64 total
      required list<model.Teacher> teacher_list
 }
 
+struct GetTeacherDetailReq {
+    required i64 teacher_id
+}
+struct GetTeacherDetailResp {
+    required model.BaseResp base_resp,
+    required model.Teacher data
+}
+
 service SchoolStructService {
-    GetCollegeListResp GetCollegeList(1: GetCollegeListReq req)(api.get="/school/college/list")
-    GetMajorListResp GetMajorList(1: GetMajorListReq req)(api.get="/school/major/list")
-    GetTeacherListResp GetTeacherList(1: GetTeacherListReq req)(api.get="/school/teacher/list")
+    GetCollegeListResp GetCollegeList(1: GetCollegeListReq req)(api.get="/api/school/college/list")
+    GetMajorListResp GetMajorList(1: GetMajorListReq req)(api.get="/api/school/major/list")
+    GetTeacherListResp GetTeacherList(1: GetTeacherListReq req)(api.get="/api/school/teacher/list")
+    GetTeacherDetailResp GetTeacherDetail(1: GetTeacherDetailReq req)(api.get="/api/school/teacher/detail")
 }
 
 struct AdminAddCollegeReq{
