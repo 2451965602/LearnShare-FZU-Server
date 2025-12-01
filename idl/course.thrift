@@ -59,12 +59,15 @@ struct GetCourseCommentsResp {
 // 提交课程评分
 struct SubmitCourseRatingReq {
   required i64 course_id (api.path="course_id");
-  required double rating 
+  required double rating
+  required i32 difficulty
+  required i32 workload
+  required i32 usefulness
 }
 
 struct SubmitCourseRatingResp {
   required model.BaseResp baseResponse;
-  optional model.CourseRating rating;  
+  required model.CourseRating rating;  
 }
 
 
@@ -77,7 +80,7 @@ struct SubmitCourseCommentReq {
 
 struct SubmitCourseCommentResp {
   required model.BaseResp baseResponse;
-  optional model.CourseComment comment;  
+  required model.CourseComment comment;  
 }
 
 // 删除课程评论
@@ -158,8 +161,6 @@ service AdminCourseService{
     AdminDeleteCourseResp AdminDeleteCourse(1:AdminDeleteCourseReq req)(api.delete="/api/admin/courses/:course_id"),
 
 }
-
-
 
 
 

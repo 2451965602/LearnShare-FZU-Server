@@ -36,7 +36,10 @@ struct CourseRating {
     required i64 ratingId,
     required i64 userId,
     required i64 courseId,
-    required i32 usefulness,          
+    required i32 recommendation,
+    required string difficulty,
+    required i32 workload,
+    required i32 usefulness,
     required bool isVisible,
     required i64 createdAt,
 }

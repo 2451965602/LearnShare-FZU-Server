@@ -133,26 +133,42 @@ func (s *CourseService) GetCourseComments(req *course.GetCourseCommentsReq) ([]*
 	return commentModules, nil
 }
 
-func (s *CourseService) SubmitCourseRating(req *course.SubmitCourseRatingReq) error {
+func (s *CourseService) SubmitCourseRating(req *course.SubmitCourseRatingReq) (*module.CourseRating, error) {
 	userID := GetUidFormContext(s.c)
 
 	if req.Rating < 0 || req.Rating > 5 {
-		return errno.ValidationRatingRangeInvalidError
+		return nil, errno.ValidationRatingRangeInvalidError
+	}
+
+	if req.Difficulty < 1 || req.Difficulty > 5 {
+		return nil, errno.NewErrNo(errno.ServiceInvalidParameter, "难度必须在1-5之间")
+	}
+	if req.Workload < 1 || req.Workload > 5 {
+		return nil, errno.NewErrNo(errno.ServiceInvalidParameter, "考核压力必须在1-5之间")
+	}
+	if req.Usefulness < 1 || req.Usefulness > 5 {
+		return nil, errno.NewErrNo(errno.ServiceInvalidParameter, "实用性必须在1-5之间")
 	}
 
 	rating := &db.CourseRating{
-		UserID:   userID,
-		CourseID: req.CourseID,
+		UserID:         userID,
+		CourseID:       req.CourseID,
+		Recommendation: req.Rating,
+		Difficulty:     uint8(req.Difficulty),
+		Workload:       uint8(req.Workload),
+		Usefulness:     uint8(req.Usefulness),
+		IsVisible:      true,
 	}
 
-	if err := db.SubmitCourseRating(s.ctx, rating); err != nil {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交课程评分失败: "+err.Error())
-	}
+    saved, err := db.SubmitCourseRating(s.ctx, rating)
+    if err != nil {
+        return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交课程评分失败: "+err.Error())
+    }
 
-	return nil
+    return saved.ToCourseRatingModule(), nil
 }
 
-func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) error {
+func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) (*module.CourseComment, error) {
 	// 获取用户ID
 	userID := GetUidFormContext(s.c)
 
@@ -170,15 +186,15 @@ func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) 
 		Content:   req.Contents,
 		ParentID:  parentIDPtr,
 		IsVisible: isVisible,
+		Status:    "normal",
 	}
 
 	// 使用异步提交评论
-	errChan := db.SubmitCourseCommentAsync(s.ctx, comment)
-	if err := <-errChan; err != nil {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评论失败: "+err.Error())
+	if err := db.SubmitCourseComment(s.ctx, comment); err != nil {
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评论失败: "+err.Error())
 	}
 
-	return nil
+	return comment.ToCourseCommentModule(), nil
 }
 
 func (s *CourseService) DeleteCourseComment(req *course.DeleteCourseCommentReq) error {
