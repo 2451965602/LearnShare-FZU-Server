@@ -4,6 +4,7 @@ package resource
 
 import (
 	"context"
+	"strconv"
 
 	"LearnShare/biz/model/resource"
 	"LearnShare/biz/pack"
@@ -17,23 +18,43 @@ import (
 // @router /api/resources/search [GET]
 func SearchResources(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req resource.SearchResourceReq
-	err = c.BindAndValidate(&req)
+	type searchQuery struct {
+		Keyword  string `query:"keyword"`
+		TagId    string `query:"tagId"`
+		SortBy   string `query:"sortBy"`
+		CourseID string `query:"course_id"`
+		PageSize int32  `query:"page_size,required"`
+		PageNum  int32  `query:"page_num,required"`
+	}
+	var q searchQuery
+	err = c.BindAndValidate(&q)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	if req.TagId != nil && *req.TagId == 0 {
-		req.TagId = nil
+	var req resource.SearchResourceReq
+	if q.Keyword != "" {
+		req.Keyword = &q.Keyword
 	}
-	if req.CourseID != nil && *req.CourseID == 0 {
-		req.CourseID = nil
+	if q.SortBy != "" {
+		req.SortBy = &q.SortBy
 	}
+	if q.TagId != "" {
+		if v, e := strconv.ParseInt(q.TagId, 10, 64); e == nil {
+			req.TagId = &v
+		}
+	}
+	if q.CourseID != "" {
+		if v, e := strconv.ParseInt(q.CourseID, 10, 64); e == nil {
+			req.CourseID = &v
+		}
+	}
+	req.PageSize = q.PageSize
+	req.PageNum = q.PageNum
 
 	resp := new(resource.SearchResourceResp)
 
-	// Call service
 	moduleResources, total, err := service.NewResourceService(ctx, c).SearchResources(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)

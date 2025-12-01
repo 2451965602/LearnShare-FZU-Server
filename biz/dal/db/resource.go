@@ -558,7 +558,8 @@ func CreateReview(ctx context.Context, creatorID int64, targetID int64, targetTy
 		TargetID:   targetID,
 		TargetType: targetType,
 		Reason:     reason,
-		ReviewerID: &creatorID, // 使用 creatorID
+		ReporterID: creatorID, // 举报者
+		ReviewerID: nil,       // 审核人暂为空，待审核分配
 	}
 
 	result := DB.WithContext(ctx).Table(constants.ReviewTableName).Create(review)
