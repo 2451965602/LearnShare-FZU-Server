@@ -122,12 +122,12 @@ func (s *ResourceService) GetResourceComments(req *resource.GetResourceCommentsR
 		return nil, 0, err
 	}
 
-	var modelComments []*model.ResourceCommentWithUser
-	for _, comment := range comments {
-		modelComments = append(modelComments, comment.ToResourceCommentWithUserModule())
-	}
+    modelComments := make([]*model.ResourceCommentWithUser, 0, len(comments))
+    for _, comment := range comments {
+        modelComments = append(modelComments, comment.ToResourceCommentWithUserModule())
+    }
 
-	return modelComments, total, nil
+    return modelComments, total, nil
 }
 
 // SubmitResourceRating 执行提交资源评分
@@ -355,15 +355,17 @@ func (s *ResourceService) UploadResource(file *multipart.FileHeader, title strin
 	}
 
 	// 直接构建返回结果，避免重复查询
-	var tagsResp []*model.ResourceTag
-	if res.Tags != nil {
-		for _, t := range res.Tags {
-			tagsResp = append(tagsResp, t.ToResourceTagModule())
-		}
-	}
+    var tagsResp []*model.ResourceTag
+    if res.Tags != nil {
+        for _, t := range res.Tags {
+            tagsResp = append(tagsResp, t.ToResourceTagModule())
+        }
+    } else {
+        tagsResp = make([]*model.ResourceTag, 0)
+    }
 
-	resp := res.ToResourceModule()
-	resp.Tags = tagsResp
+    resp := res.ToResourceModule()
+    resp.Tags = tagsResp
 
 	return resp, nil
 }

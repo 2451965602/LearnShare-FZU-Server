@@ -99,7 +99,7 @@ type Resource struct {
 
 // ToResourceModule 将db.Resource转换为model.Resource
 func (r Resource) ToResourceModule() *module.Resource {
-	var tags []*module.ResourceTag
+    var tags []*module.ResourceTag
 	seen := make(map[int64]struct{})
 	for _, t := range r.Tags {
 		if _, ok := seen[t.TagID]; ok {
@@ -109,21 +109,24 @@ func (r Resource) ToResourceModule() *module.Resource {
 		tags = append(tags, t.ToResourceTagModule())
 	}
 
-	return &module.Resource{
-		ResourceId:    r.ResourceID,
-		Title:         r.ResourceName,
-		Description:   &r.Description,
-		FileType:      r.FileType,
-		FileSize:      r.FileSize,
-		UploaderId:    r.UploaderID,
-		CourseId:      r.CourseID,
-		DownloadCount: r.DownloadCount,
-		AverageRating: r.AverageRating,
-		RatingCount:   r.RatingCount,
-		Status:        convertStatus(r.Status),
-		CreatedAt:     r.CreatedAt.Unix(),
-		Tags:          tags,
-	}
+    if tags == nil {
+        tags = make([]*module.ResourceTag, 0)
+    }
+    return &module.Resource{
+        ResourceId:    r.ResourceID,
+        Title:         r.ResourceName,
+        Description:   &r.Description,
+        FileType:      r.FileType,
+        FileSize:      r.FileSize,
+        UploaderId:    r.UploaderID,
+        CourseId:      r.CourseID,
+        DownloadCount: r.DownloadCount,
+        AverageRating: r.AverageRating,
+        RatingCount:   r.RatingCount,
+        Status:        convertStatus(r.Status),
+        CreatedAt:     r.CreatedAt.Unix(),
+        Tags:          tags,
+    }
 }
 
 func convertStatus(status string) int32 {
