@@ -49,7 +49,7 @@ func (s *ResourceService) SearchResources(req *resource.SearchResourceReq) ([]*m
 		return nil, 0, err
 	}
 
-	var modelResources []*model.Resource
+	modelResources := make([]*model.Resource, 0, len(resources))
 	for _, r := range resources {
 		modelResources = append(modelResources, r.ToResourceModule())
 	}

@@ -100,7 +100,12 @@ type Resource struct {
 // ToResourceModule 将db.Resource转换为model.Resource
 func (r Resource) ToResourceModule() *module.Resource {
 	var tags []*module.ResourceTag
+	seen := make(map[int64]struct{})
 	for _, t := range r.Tags {
+		if _, ok := seen[t.TagID]; ok {
+			continue
+		}
+		seen[t.TagID] = struct{}{}
 		tags = append(tags, t.ToResourceTagModule())
 	}
 
@@ -108,7 +113,6 @@ func (r Resource) ToResourceModule() *module.Resource {
 		ResourceId:    r.ResourceID,
 		Title:         r.ResourceName,
 		Description:   &r.Description,
-		FilePath:      r.FilePath,
 		FileType:      r.FileType,
 		FileSize:      r.FileSize,
 		UploaderId:    r.UploaderID,
@@ -123,22 +127,26 @@ func (r Resource) ToResourceModule() *module.Resource {
 }
 
 func convertStatus(status string) int32 {
+	// 与接口文档保持一致：0 待审核, 1 已发布, 2 已拒绝
 	switch status {
 	case "pending_review":
-		return 1
-	case "normal":
 		return 0
+	case "normal":
+		return 1
 	case "low_quality":
 		return 2
 	default:
-		return 1 // 默认为待审核
+		return 0
 	}
 }
 
 type ResourceTag struct {
-	TagID   int64  `gorm:"primaryKey;autoIncrement;table:tags"`
-	TagName string `gorm:"size:50;unique;not null"`
+	TagID   int64  `gorm:"primaryKey;column:tag_id"`
+	TagName string `gorm:"column:tag_name;size:50;unique;not null"`
 }
+
+// TableName 指定标签表名为 tags
+func (ResourceTag) TableName() string { return "tags" }
 
 // ToResourceTagModule 将db.ResourceTag转换为model.ResourceTag
 func (t ResourceTag) ToResourceTagModule() *module.ResourceTag {
