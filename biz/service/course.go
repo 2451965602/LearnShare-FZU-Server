@@ -4,16 +4,20 @@ import (
 	"LearnShare/biz/dal/db"
 	"LearnShare/biz/model/course"
 	"LearnShare/biz/model/module"
-	"LearnShare/config"
 	"LearnShare/pkg/errno"
+	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
+	"encoding/base64"
+	"image"
+	"image/color"
+	"image/png"
 	"io"
 	"net/http"
 	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/fogleman/gg"
+	"github.com/golang/freetype/truetype"
 )
 
 type CourseService struct {
@@ -258,38 +262,49 @@ func (s *CourseService) AdminDeleteCourseRating(req *course.AdminDeleteCourseRat
 }
 
 func (s *CourseService) GetCourseImage(name string) (string, error) {
-	url := "https://api.317ak.com/api/yljk/ysqm/ysqm?ckey=" + config.ImageGenerate.CKey + "&msg=" + name + "&id1=" + config.ImageGenerate.Id1
+	const width, height = 800, 400
+	dc := gg.NewContext(width, height)
 
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return "", err
-	}
-	req.Header.Set("Content-Type", "application/json")
+	// 创建渐变背景
+	grad := gg.NewLinearGradient(0, 0, width, height)
+	grad.AddColorStop(0, color.RGBA{R: 99, G: 102, B: 241, A: 255})
+	grad.AddColorStop(1, color.RGBA{R: 168, G: 85, B: 247, A: 255})
+	dc.SetFillStyle(grad)
+	dc.DrawRectangle(0, 0, float64(width), float64(height))
+	dc.Fill()
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	// 下载在线字体
+	resp, err := http.Get("https://github.com/googlefonts/noto-cjk/raw/main/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Bold.otf")
 	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
+	fontBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("request failed: status=%d body=%s", resp.StatusCode, string(body))
-	}
 
-	var payload struct {
-		URL string `json:"url"`
-	}
-	if err := json.Unmarshal(body, &payload); err != nil {
+	font, err := truetype.Parse(fontBytes)
+	if err != nil {
 		return "", err
 	}
-	if payload.URL == "" {
-		return "", fmt.Errorf("url not found in response")
-	}
 
-	return payload.URL, nil
+	face := truetype.NewFace(font, &truetype.Options{Size: 80})
+	dc.SetFontFace(face)
+
+	// 绘制文字阴影
+	dc.SetColor(color.RGBA{0, 0, 0, 100})
+	dc.DrawStringAnchored(name, width/2+4, height/2+4, 0.5, 0.5)
+
+	// 绘制主文字
+	dc.SetColor(color.White)
+	dc.DrawStringAnchored(name, width/2, height/2, 0.5, 0.5)
+
+	// 编码为base64
+	var buf bytes.Buffer
+	if err := png.Encode(&buf, dc.Image().(image.Image)); err != nil {
+		return "", err
+	}
+	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(buf.Bytes()), nil
 }

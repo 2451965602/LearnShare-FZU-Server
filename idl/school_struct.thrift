@@ -21,7 +21,7 @@ struct GetMajorListResp {
 }
 
 struct GetTeacherListReq {
-    required i64 major_id
+    required i64 college_id
     required i64 page_num
     required i64 page_size
 }
@@ -31,9 +31,9 @@ struct GetTeacherListResp {
 }
 
 service SchoolStructService {
-    GetCollegeListResp GetCollegeList(1: GetCollegeListReq req)(api.get="/school/college/list")
-    GetMajorListResp GetMajorList(1: GetMajorListReq req)(api.get="/school/major/list")
-    GetTeacherListResp GetTeacherList(1: GetTeacherListReq req)(api.get="/school/teacher/list")
+    GetCollegeListResp GetCollegeList(1: GetCollegeListReq req)(api.get="/api/school/college/list")
+    GetMajorListResp GetMajorList(1: GetMajorListReq req)(api.get="/api/school/major/list")
+    GetTeacherListResp GetTeacherList(1: GetTeacherListReq req)(api.get="/api/school/teacher/list")
 }
 
 struct AdminAddCollegeReq{

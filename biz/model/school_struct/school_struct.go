@@ -907,9 +907,9 @@ func (p *GetMajorListResp) String() string {
 }
 
 type GetTeacherListReq struct {
-	MajorID  int64 `thrift:"major_id,1,required" form:"major_id,required" json:"major_id,required" query:"major_id,required"`
-	PageNum  int64 `thrift:"page_num,2,required" form:"page_num,required" json:"page_num,required" query:"page_num,required"`
-	PageSize int64 `thrift:"page_size,3,required" form:"page_size,required" json:"page_size,required" query:"page_size,required"`
+	CollegeID int64 `thrift:"college_id,1,required" form:"college_id,required" json:"college_id,required" query:"college_id,required"`
+	PageNum   int64 `thrift:"page_num,2,required" form:"page_num,required" json:"page_num,required" query:"page_num,required"`
+	PageSize  int64 `thrift:"page_size,3,required" form:"page_size,required" json:"page_size,required" query:"page_size,required"`
 }
 
 func NewGetTeacherListReq() *GetTeacherListReq {
@@ -919,8 +919,8 @@ func NewGetTeacherListReq() *GetTeacherListReq {
 func (p *GetTeacherListReq) InitDefault() {
 }
 
-func (p *GetTeacherListReq) GetMajorID() (v int64) {
-	return p.MajorID
+func (p *GetTeacherListReq) GetCollegeID() (v int64) {
+	return p.CollegeID
 }
 
 func (p *GetTeacherListReq) GetPageNum() (v int64) {
@@ -932,7 +932,7 @@ func (p *GetTeacherListReq) GetPageSize() (v int64) {
 }
 
 var fieldIDToName_GetTeacherListReq = map[int16]string{
-	1: "major_id",
+	1: "college_id",
 	2: "page_num",
 	3: "page_size",
 }
@@ -941,7 +941,7 @@ func (p *GetTeacherListReq) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetMajorID bool = false
+	var issetCollegeID bool = false
 	var issetPageNum bool = false
 	var issetPageSize bool = false
 
@@ -964,7 +964,7 @@ func (p *GetTeacherListReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetMajorID = true
+				issetCollegeID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -999,7 +999,7 @@ func (p *GetTeacherListReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetMajorID {
+	if !issetCollegeID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -1039,7 +1039,7 @@ func (p *GetTeacherListReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.MajorID = _field
+	p.CollegeID = _field
 	return nil
 }
 func (p *GetTeacherListReq) ReadField2(iprot thrift.TProtocol) error {
@@ -1102,10 +1102,10 @@ WriteStructEndError:
 }
 
 func (p *GetTeacherListReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("major_id", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("college_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.MajorID); err != nil {
+	if err := oprot.WriteI64(p.CollegeID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {

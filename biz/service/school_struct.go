@@ -73,7 +73,7 @@ func (s *SchoolStructService) GetTeacherList(req *school_struct.GetTeacherListRe
 		req.PageSize = 10
 	}
 
-	teachers, total, err := db.GetTeacherListByCollegeId(s.ctx, req.MajorID, int(req.PageNum), int(req.PageSize))
+	teachers, total, err := db.GetTeacherListByCollegeId(s.ctx, req.CollegeID, int(req.PageNum), int(req.PageSize))
 	if err != nil {
 		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "获取教师列表失败: "+err.Error())
 	}
