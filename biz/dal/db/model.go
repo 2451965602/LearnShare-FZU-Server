@@ -2,6 +2,7 @@ package db
 
 import (
 	"LearnShare/biz/model/module"
+	"fmt"
 	"time"
 )
 
@@ -99,7 +100,7 @@ type Resource struct {
 
 // ToResourceModule 将db.Resource转换为model.Resource
 func (r Resource) ToResourceModule() *module.Resource {
-    var tags []*module.ResourceTag
+	var tags []*module.ResourceTag
 	seen := make(map[int64]struct{})
 	for _, t := range r.Tags {
 		if _, ok := seen[t.TagID]; ok {
@@ -109,24 +110,24 @@ func (r Resource) ToResourceModule() *module.Resource {
 		tags = append(tags, t.ToResourceTagModule())
 	}
 
-    if tags == nil {
-        tags = make([]*module.ResourceTag, 0)
-    }
-    return &module.Resource{
-        ResourceId:    r.ResourceID,
-        Title:         r.ResourceName,
-        Description:   &r.Description,
-        FileType:      r.FileType,
-        FileSize:      r.FileSize,
-        UploaderId:    r.UploaderID,
-        CourseId:      r.CourseID,
-        DownloadCount: r.DownloadCount,
-        AverageRating: r.AverageRating,
-        RatingCount:   r.RatingCount,
-        Status:        convertStatus(r.Status),
-        CreatedAt:     r.CreatedAt.Unix(),
-        Tags:          tags,
-    }
+	if tags == nil {
+		tags = make([]*module.ResourceTag, 0)
+	}
+	return &module.Resource{
+		ResourceId:    r.ResourceID,
+		Title:         r.ResourceName,
+		Description:   &r.Description,
+		FileType:      r.FileType,
+		FileSize:      r.FileSize,
+		UploaderId:    r.UploaderID,
+		CourseId:      r.CourseID,
+		DownloadCount: r.DownloadCount,
+		AverageRating: r.AverageRating,
+		RatingCount:   r.RatingCount,
+		Status:        convertStatus(r.Status),
+		CreatedAt:     r.CreatedAt.Unix(),
+		Tags:          tags,
+	}
 }
 
 func convertStatus(status string) int32 {
@@ -186,21 +187,29 @@ type ResourceCommentrow struct {
 
 // CourseRating 课程评分
 type CourseRating struct {
-	RatingID  int64     `json:"rating_id" db:"rating_id"`
-	UserID    int64     `json:"user_id" db:"user_id"`
-	CourseID  int64     `json:"course_id" db:"course_id"`
-	IsVisible bool      `json:"is_visible" db:"is_visible"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+	RatingID       int64     `json:"rating_id" db:"rating_id"`
+	UserID         int64     `json:"user_id" db:"user_id"`
+	CourseID       int64     `json:"course_id" db:"course_id"`
+	Recommendation float64   `json:"recommendation" db:"recommendation"`
+	Difficulty     uint8     `json:"difficulty" db:"difficulty"`
+	Workload       uint8     `json:"workload" db:"workload"`
+	Usefulness     uint8     `json:"usefulness" db:"usefulness"`
+	IsVisible      bool      `json:"is_visible" db:"is_visible"`
+	CreatedAt      time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at" db:"updated_at"`
 }
 
 func (r CourseRating) ToCourseRatingModule() *module.CourseRating {
 	return &module.CourseRating{
-		RatingId:  r.RatingID,
-		UserId:    r.UserID,
-		CourseId:  r.CourseID,
-		IsVisible: r.IsVisible,
-		CreatedAt: r.CreatedAt.Unix(), // time.Time → i64
+		RatingId:       r.RatingID,
+		UserId:         r.UserID,
+		CourseId:       r.CourseID,
+		Recommendation: int32(r.Recommendation),
+		Difficulty:     fmt.Sprintf("%d", r.Difficulty),
+		Workload:       int32(r.Workload),
+		Usefulness:     int32(r.Usefulness),
+		IsVisible:      r.IsVisible,
+		CreatedAt:      r.CreatedAt.Unix(),
 	}
 }
 

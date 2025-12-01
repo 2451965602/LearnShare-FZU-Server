@@ -134,7 +134,7 @@ func SubmitCourseRating(ctx context.Context, c *app.RequestContext) {
 	resp := new(course.SubmitCourseRatingResp)
 
 	// Call service
-	err = service.NewCourseService(ctx, c).SubmitCourseRating(&req)
+	rating, err := service.NewCourseService(ctx, c).SubmitCourseRating(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
@@ -142,6 +142,7 @@ func SubmitCourseRating(ctx context.Context, c *app.RequestContext) {
 
 	// Build response
 	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+	resp.Rating = rating
 
 	pack.SendResponse(c, resp)
 }
@@ -160,7 +161,7 @@ func SubmitCourseComment(ctx context.Context, c *app.RequestContext) {
 	resp := new(course.SubmitCourseCommentResp)
 
 	// Call service
-	err = service.NewCourseService(ctx, c).SubmitCourseComment(&req)
+	comment, err := service.NewCourseService(ctx, c).SubmitCourseComment(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
@@ -168,6 +169,7 @@ func SubmitCourseComment(ctx context.Context, c *app.RequestContext) {
 
 	// Build response
 	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+	resp.Comment = comment
 
 	pack.SendResponse(c, resp)
 }

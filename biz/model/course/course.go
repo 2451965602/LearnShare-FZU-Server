@@ -2175,8 +2175,11 @@ func (p *GetCourseCommentsResp) String() string {
 
 // 提交课程评分
 type SubmitCourseRatingReq struct {
-	CourseID int64   `thrift:"course_id,1,required" json:"course_id,required" path:"course_id,required"`
-	Rating   float64 `thrift:"rating,2,required" form:"rating,required" json:"rating,required" query:"rating,required"`
+	CourseID   int64   `thrift:"course_id,1,required" json:"course_id,required" path:"course_id,required"`
+	Rating     float64 `thrift:"rating,2,required" form:"rating,required" json:"rating,required" query:"rating,required"`
+	Difficulty int32   `thrift:"difficulty,3,required" form:"difficulty,required" json:"difficulty,required" query:"difficulty,required"`
+	Workload   int32   `thrift:"workload,4,required" form:"workload,required" json:"workload,required" query:"workload,required"`
+	Usefulness int32   `thrift:"usefulness,5,required" form:"usefulness,required" json:"usefulness,required" query:"usefulness,required"`
 }
 
 func NewSubmitCourseRatingReq() *SubmitCourseRatingReq {
@@ -2194,9 +2197,24 @@ func (p *SubmitCourseRatingReq) GetRating() (v float64) {
 	return p.Rating
 }
 
+func (p *SubmitCourseRatingReq) GetDifficulty() (v int32) {
+	return p.Difficulty
+}
+
+func (p *SubmitCourseRatingReq) GetWorkload() (v int32) {
+	return p.Workload
+}
+
+func (p *SubmitCourseRatingReq) GetUsefulness() (v int32) {
+	return p.Usefulness
+}
+
 var fieldIDToName_SubmitCourseRatingReq = map[int16]string{
 	1: "course_id",
 	2: "rating",
+	3: "difficulty",
+	4: "workload",
+	5: "usefulness",
 }
 
 func (p *SubmitCourseRatingReq) Read(iprot thrift.TProtocol) (err error) {
@@ -2205,6 +2223,9 @@ func (p *SubmitCourseRatingReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	var issetCourseID bool = false
 	var issetRating bool = false
+	var issetDifficulty bool = false
+	var issetWorkload bool = false
+	var issetUsefulness bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -2238,6 +2259,33 @@ func (p *SubmitCourseRatingReq) Read(iprot thrift.TProtocol) (err error) {
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
+		case 3:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField3(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetDifficulty = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 4:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetWorkload = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 5:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField5(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetUsefulness = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -2258,6 +2306,21 @@ func (p *SubmitCourseRatingReq) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetRating {
 		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetDifficulty {
+		fieldId = 3
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetWorkload {
+		fieldId = 4
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetUsefulness {
+		fieldId = 5
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -2300,6 +2363,39 @@ func (p *SubmitCourseRatingReq) ReadField2(iprot thrift.TProtocol) error {
 	p.Rating = _field
 	return nil
 }
+func (p *SubmitCourseRatingReq) ReadField3(iprot thrift.TProtocol) error {
+
+	var _field int32
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Difficulty = _field
+	return nil
+}
+func (p *SubmitCourseRatingReq) ReadField4(iprot thrift.TProtocol) error {
+
+	var _field int32
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Workload = _field
+	return nil
+}
+func (p *SubmitCourseRatingReq) ReadField5(iprot thrift.TProtocol) error {
+
+	var _field int32
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Usefulness = _field
+	return nil
+}
 
 func (p *SubmitCourseRatingReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
@@ -2313,6 +2409,18 @@ func (p *SubmitCourseRatingReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField2(oprot); err != nil {
 			fieldId = 2
+			goto WriteFieldError
+		}
+		if err = p.writeField3(oprot); err != nil {
+			fieldId = 3
+			goto WriteFieldError
+		}
+		if err = p.writeField4(oprot); err != nil {
+			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
 			goto WriteFieldError
 		}
 	}
@@ -2367,6 +2475,57 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
+func (p *SubmitCourseRatingReq) writeField3(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("difficulty", thrift.I32, 3); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.Difficulty); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
+func (p *SubmitCourseRatingReq) writeField4(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("workload", thrift.I32, 4); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.Workload); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
+}
+
+func (p *SubmitCourseRatingReq) writeField5(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("usefulness", thrift.I32, 5); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.Usefulness); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
+}
+
 func (p *SubmitCourseRatingReq) String() string {
 	if p == nil {
 		return "<nil>"
@@ -2377,7 +2536,7 @@ func (p *SubmitCourseRatingReq) String() string {
 
 type SubmitCourseRatingResp struct {
 	BaseResponse *module.BaseResp     `thrift:"baseResponse,1,required" form:"baseResponse,required" json:"baseResponse,required" query:"baseResponse,required"`
-	Rating       *module.CourseRating `thrift:"rating,2,optional" form:"rating" json:"rating,omitempty" query:"rating"`
+	Rating       *module.CourseRating `thrift:"rating,2,required" form:"rating,required" json:"rating,required" query:"rating,required"`
 }
 
 func NewSubmitCourseRatingResp() *SubmitCourseRatingResp {
@@ -2423,6 +2582,7 @@ func (p *SubmitCourseRatingResp) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetBaseResponse bool = false
+	var issetRating bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -2452,6 +2612,7 @@ func (p *SubmitCourseRatingResp) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetRating = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -2470,6 +2631,11 @@ func (p *SubmitCourseRatingResp) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetBaseResponse {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetRating {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -2557,16 +2723,14 @@ WriteFieldEndError:
 }
 
 func (p *SubmitCourseRatingResp) writeField2(oprot thrift.TProtocol) (err error) {
-	if p.IsSetRating() {
-		if err = oprot.WriteFieldBegin("rating", thrift.STRUCT, 2); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := p.Rating.Write(oprot); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
+	if err = oprot.WriteFieldBegin("rating", thrift.STRUCT, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Rating.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
 	}
 	return nil
 WriteFieldBeginError:
@@ -2906,7 +3070,7 @@ func (p *SubmitCourseCommentReq) String() string {
 
 type SubmitCourseCommentResp struct {
 	BaseResponse *module.BaseResp      `thrift:"baseResponse,1,required" form:"baseResponse,required" json:"baseResponse,required" query:"baseResponse,required"`
-	Comment      *module.CourseComment `thrift:"comment,2,optional" form:"comment" json:"comment,omitempty" query:"comment"`
+	Comment      *module.CourseComment `thrift:"comment,2,required" form:"comment,required" json:"comment,required" query:"comment,required"`
 }
 
 func NewSubmitCourseCommentResp() *SubmitCourseCommentResp {
@@ -2952,6 +3116,7 @@ func (p *SubmitCourseCommentResp) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetBaseResponse bool = false
+	var issetComment bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -2981,6 +3146,7 @@ func (p *SubmitCourseCommentResp) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
+				issetComment = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -2999,6 +3165,11 @@ func (p *SubmitCourseCommentResp) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetBaseResponse {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetComment {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -3086,16 +3257,14 @@ WriteFieldEndError:
 }
 
 func (p *SubmitCourseCommentResp) writeField2(oprot thrift.TProtocol) (err error) {
-	if p.IsSetComment() {
-		if err = oprot.WriteFieldBegin("comment", thrift.STRUCT, 2); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := p.Comment.Write(oprot); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
+	if err = oprot.WriteFieldBegin("comment", thrift.STRUCT, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Comment.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
 	}
 	return nil
 WriteFieldBeginError:
