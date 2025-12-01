@@ -173,11 +173,12 @@ func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) 
 	userID := GetUidFormContext(s.c)
 
 	comment := &db.CourseComment{
-		CourseID: req.CourseID,
-		UserID:   userID,
-		Content:  req.Contents,
-		ParentID: req.ParentID,
-		Status:   "normal",
+		CourseID:  req.CourseID,
+		UserID:    userID,
+		Content:   req.Contents,
+		ParentID:  req.ParentID,
+		IsVisible: true,
+		Status:    "normal",
 	}
 
 	// 使用异步提交评论
