@@ -6,8 +6,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 func CreateCourse(ctx context.Context, courseName string, teacherID, majorID int64, credit float64, grade, description string) error {
@@ -114,56 +115,56 @@ func SearchCourses(ctx context.Context, keywords string, grade string, pageNum, 
 }
 
 func SubmitCourseRating(ctx context.Context, rating *CourseRating) (*CourseRating, error) {
-    tx := DB.WithContext(ctx).Begin()
-    defer func() {
-        if r := recover(); r != nil {
-            tx.Rollback()
-        }
-    }()
+	tx := DB.WithContext(ctx).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 
-    var existing CourseRating
-    if err := tx.Table(constants.CourseRatingTableName).
-        Where("user_id = ? AND course_id = ?", rating.UserID, rating.CourseID).
-        First(&existing).Error; err != nil && err.Error() != "record not found" {
-        tx.Rollback()
-        return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询课程评分记录失败: "+err.Error())
-    }
+	var existing CourseRating
+	if err := tx.Table(constants.CourseRatingTableName).
+		Where("user_id = ? AND course_id = ?", rating.UserID, rating.CourseID).
+		First(&existing).Error; err != nil && err.Error() != "record not found" {
+		tx.Rollback()
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询课程评分记录失败: "+err.Error())
+	}
 
-    if existing.RatingID > 0 {
-        existing.Recommendation = rating.Recommendation
-        existing.Difficulty = rating.Difficulty
-        existing.Workload = rating.Workload
-        existing.Usefulness = rating.Usefulness
-        existing.IsVisible = true
-        if err := tx.Table(constants.CourseRatingTableName).Save(&existing).Error; err != nil {
-            tx.Rollback()
-            return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新课程评分失败: "+err.Error())
-        }
-        if err := tx.Commit().Error; err != nil {
-            tx.Rollback()
-            return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评分事务失败: "+err.Error())
-        }
-        return &existing, nil
-    }
+	if existing.RatingID > 0 {
+		existing.Recommendation = rating.Recommendation
+		existing.Difficulty = rating.Difficulty
+		existing.Workload = rating.Workload
+		existing.Usefulness = rating.Usefulness
+		existing.IsVisible = true
+		if err := tx.Table(constants.CourseRatingTableName).Save(&existing).Error; err != nil {
+			tx.Rollback()
+			return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新课程评分失败: "+err.Error())
+		}
+		if err := tx.Commit().Error; err != nil {
+			tx.Rollback()
+			return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评分事务失败: "+err.Error())
+		}
+		return &existing, nil
+	}
 
-    if err := tx.Table(constants.CourseRatingTableName).Create(rating).Error; err != nil {
-        tx.Rollback()
-        return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交课程评分失败: "+err.Error())
-    }
-    if err := tx.Commit().Error; err != nil {
-        tx.Rollback()
-        return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评分事务失败: "+err.Error())
-    }
-    return rating, nil
+	if err := tx.Table(constants.CourseRatingTableName).Create(rating).Error; err != nil {
+		tx.Rollback()
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交课程评分失败: "+err.Error())
+	}
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评分事务失败: "+err.Error())
+	}
+	return rating, nil
 }
 
 // SubmitCourseRatingAsync 异步提交课程评分
 func SubmitCourseRatingAsync(ctx context.Context, rating *CourseRating) chan error {
-    pool := GetAsyncPool()
-    return pool.Submit(func() error {
-        _, err := SubmitCourseRating(ctx, rating)
-        return err
-    })
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		_, err := SubmitCourseRating(ctx, rating)
+		return err
+	})
 }
 
 func UpdateCourseRating(ctx context.Context, ratingID int64, updates map[string]interface{}) error {
