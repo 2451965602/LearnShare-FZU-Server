@@ -37,6 +37,7 @@ func Register(r *server.Hertz) {
 			}
 			{
 				_teacher := _school.Group("/teacher", _teacherMw()...)
+				_teacher.GET("/detail", append(_getteacherdetailMw(), school_struct.GetTeacherDetail)...)
 				_teacher.GET("/list", append(_getteacherlistMw(), school_struct.GetTeacherList)...)
 			}
 		}

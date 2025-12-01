@@ -66,6 +66,21 @@ func GetTeacherListByCollegeId(ctx context.Context, collegeId int64, pageNum, pa
 	return teachers, total, nil
 }
 
+func GetTeacherByID(ctx context.Context, teacherID int64) (*Teacher, error) {
+	{
+		var teacher Teacher
+
+		err := DB.WithContext(ctx).Table(constants.TeacherTableName).
+			Where("teacher_id = ?", teacherID).
+			First(&teacher).Error
+		if err != nil {
+			return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询教师失败: "+err.Error())
+		}
+
+		return &teacher, nil
+	}
+}
+
 // AdminAddCollege 管理员添加学院
 func AdminAddCollege(ctx context.Context, collegeName string) (int64, error) {
 	college := &College{

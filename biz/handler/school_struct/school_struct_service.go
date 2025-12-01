@@ -5,6 +5,7 @@ package school_struct
 import (
 	"LearnShare/biz/pack"
 	"LearnShare/biz/service"
+	"LearnShare/pkg/errno"
 	"context"
 
 	"LearnShare/biz/model/school_struct"
@@ -23,18 +24,16 @@ func GetCollegeList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// 调用服务层
-	svc := service.NewSchoolStructService(ctx, c)
-	colleges, total, err := svc.GetCollegeList(&req)
+	colleges, total, err := service.NewSchoolStructService(ctx, c).GetCollegeList(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	resp := &school_struct.GetCollegeListResp{
-		Total:       total,
-		CollegeList: colleges,
-	}
+	resp := new(school_struct.GetCollegeListResp)
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.Total = total
+	resp.CollegeList = colleges
 
 	pack.SendResponse(c, resp)
 }
@@ -51,17 +50,17 @@ func GetMajorList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用服务层
-	svc := service.NewSchoolStructService(ctx, c)
-	majors, total, err := svc.GetMajorList(&req)
+	majors, total, err := service.NewSchoolStructService(ctx, c).GetMajorList(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	resp := &school_struct.GetMajorListResp{
-		Total:     total,
-		MajorList: majors,
-	}
+	resp := new(school_struct.GetMajorListResp)
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.Total = total
+	resp.MajorList = majors
 
 	pack.SendResponse(c, resp)
 }
@@ -78,17 +77,41 @@ func GetTeacherList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用服务层
-	svc := service.NewSchoolStructService(ctx, c)
-	teachers, total, err := svc.GetTeacherList(&req)
+	teachers, total, err := service.NewSchoolStructService(ctx, c).GetTeacherList(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	resp := &school_struct.GetTeacherListResp{
-		Total:       total,
-		TeacherList: teachers,
+	resp := new(school_struct.GetTeacherListResp)
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.Total = total
+	resp.TeacherList = teachers
+
+	pack.SendResponse(c, resp)
+}
+
+// GetTeacherDetail .
+// @router /api/school/teacher/detail [GET]
+func GetTeacherDetail(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req school_struct.GetTeacherDetailReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
 	}
+
+	resp := new(school_struct.GetTeacherDetailResp)
+	data, err := service.NewSchoolStructService(ctx, c).GetTeacherDetail(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.Data = data
 
 	pack.SendResponse(c, resp)
 }

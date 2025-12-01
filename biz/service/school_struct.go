@@ -86,6 +86,15 @@ func (s *SchoolStructService) GetTeacherList(req *school_struct.GetTeacherListRe
 	return teacherModules, total, nil
 }
 
+func (s *SchoolStructService) GetTeacherDetail(req *school_struct.GetTeacherDetailReq) (*module.Teacher, error) {
+	teacher, err := db.GetTeacherByID(s.ctx, req.TeacherID)
+	if err != nil {
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "获取教师详情失败: "+err.Error())
+	}
+
+	return teacher.ToTeacherModule(), nil
+}
+
 // AdminAddCollege 管理员添加学院
 func (s *SchoolStructService) AdminAddCollege(req *school_struct.AdminAddCollegeReq) (int64, error) {
 	idChan, errChan := db.AdminAddCollegeAsync(s.ctx, req.CollegeName)
