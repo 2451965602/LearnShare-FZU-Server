@@ -141,7 +141,7 @@ func SubmitCourseRating(ctx context.Context, rating *CourseRating) (*CourseRatin
 		existing.IsVisible = true
 		existing.UpdatedAt = time.Now()
 
-		if err := tx.Table(constants.CourseRatingTableName).Where("user_id = ?", rating.UserID).Save(&existing).Error; err != nil {
+		if err := tx.Table(constants.CourseRatingTableName).Where("rating_id = ?", rating.RatingID).Save(&existing).Error; err != nil {
 			tx.Rollback()
 			return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新课程评分失败: "+err.Error())
 		}
