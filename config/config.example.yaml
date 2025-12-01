@@ -44,7 +44,7 @@ logger:
 
 image_generate:
   c_key: "xlsx"
-  id1: "xxxx"
+  id1: "漫画体"
 
 cors:
   allow_origins:

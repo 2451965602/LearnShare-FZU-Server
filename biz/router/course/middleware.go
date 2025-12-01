@@ -129,7 +129,9 @@ func _comment_idMw() []app.HandlerFunc {
 
 func _reactcoursecommentMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _getcourseimageMw() []app.HandlerFunc {
