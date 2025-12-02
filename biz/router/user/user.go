@@ -24,6 +24,7 @@ func Register(r *server.Hertz) {
 			_admin.GET("/permissions", append(_getpermissionlistMw(), user.GetPermissionList)...)
 			_admin.GET("/roles", append(_getrolelistMw(), user.GetRoleList)...)
 			_admin.POST("/roles", append(_addroleMw(), user.AddRole)...)
+			_admin.GET("/users", append(_admingetuserlistMw(), user.AdminGetUserList)...)
 			_admin.POST("/users", append(_adminadduserMw(), user.AdminAddUser)...)
 			_admin.PUT("/users", append(_adminupdateuserMw(), user.AdminUpdateUser)...)
 		}

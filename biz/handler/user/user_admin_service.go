@@ -61,3 +61,29 @@ func AdminUpdateUser(ctx context.Context, c *app.RequestContext) {
 
 	pack.SendResponse(c, resp)
 }
+
+// AdminGetUserList .
+// @router /api/admin/users [GET]
+func AdminGetUserList(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req user.AdminGetUserListReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp := new(user.AdminGetUserListResp)
+
+	date, total, err := service.NewUserAdminService(ctx, c).AdminGetUserList(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.UserList = date
+	resp.Total = total
+
+	pack.SendResponse(c, resp)
+}

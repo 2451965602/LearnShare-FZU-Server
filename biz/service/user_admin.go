@@ -2,6 +2,7 @@ package service
 
 import (
 	"LearnShare/biz/dal/db"
+	"LearnShare/biz/model/module"
 	"LearnShare/biz/model/user"
 	"LearnShare/pkg/errno"
 	"LearnShare/pkg/utils"
@@ -78,4 +79,26 @@ func (s *UserAdminService) AdminUpdateUser(req *user.AdminUpdateUserReq) error {
 	}
 
 	return nil
+}
+
+func (s *UserAdminService) AdminGetUserList(req *user.AdminGetUserListReq) ([]*module.User, int64, error) {
+	if req.PageNum <= 0 {
+		req.PageNum = 1
+	}
+	if req.PageSize <= 0 {
+		req.PageSize = 10
+	}
+
+	// 获取用户列表
+	userList, total, err := db.AdminGetUserList(s.ctx, int(req.PageNum), int(req.PageSize))
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var result []*module.User
+	for _, u := range userList {
+		result = append(result, u.ToUserModule())
+	}
+
+	return result, total, nil
 }

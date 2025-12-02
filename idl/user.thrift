@@ -109,6 +109,7 @@ struct GetUserInfoResp {
 }
 
 
+
 service UserService {
   RegisterResp register(1: RegisterReq req)(api.post="/api/auth/register"),
   LoginInResp loginIn(1: LoginInReq req)(api.post="/api/auth/login"),
@@ -152,9 +153,21 @@ struct AdminUpdateUserResp{
     required model.BaseResp base_resp,
 }
 
+struct AdminGetUserListReq{
+    required i64 page_size
+    required i64 page_num
+}
+
+struct AdminGetUserListResp{
+    required model.BaseResp base_resp,
+    required list<model.User> user_list,
+    required i64 total,
+}
+
 service UserAdminService {
     AdminAddUserResp AdminAddUser(1:AdminAddUserReq req)(api.post="/api/admin/users"),
     AdminUpdateUserResp AdminUpdateUser(1:AdminUpdateUserReq req)(api.put="/api/admin/users"),
+    AdminGetUserListResp AdminGetUserList(1:AdminGetUserListReq req)(api.get="/api/admin/users"),
 }
 
 struct GetPermissionListReq{

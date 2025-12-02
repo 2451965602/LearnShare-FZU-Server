@@ -150,3 +150,8 @@ func _adminupdateuserMw() []app.HandlerFunc {
 	// 管理员更新用户，需要 user.account.manage 权限
 	return []app.HandlerFunc{auth.RequirePermission("user.account.manage")}
 }
+
+func _admingetuserlistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

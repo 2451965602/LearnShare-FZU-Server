@@ -207,3 +207,20 @@ func IncrementUserReputationAsync(ctx context.Context, userID int64, delta int64
 		return IncrementUserReputation(ctx, userID, delta)
 	})
 }
+
+func AdminGetUserList(ctx context.Context, pageNum, pageSize int) ([]*User, int64, error) {
+	var users []*User
+	var total int64
+
+	err := DB.WithContext(ctx).Table(constants.UserTableName).Count(&total).Error
+	if err != nil {
+		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询用户总数失败: "+err.Error())
+	}
+
+	err = DB.WithContext(ctx).Table(constants.UserTableName).Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&users).Error
+	if err != nil {
+		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询用户列表失败: "+err.Error())
+	}
+
+	return users, total, nil
+}
